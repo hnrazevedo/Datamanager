@@ -1,0 +1,22 @@
+{
+    "name": "hnrazevedo/hnrazevedo",
+    "description": "Tools for developing personal projects",
+    "authors": [
+        {
+            "name": "Henri Mateus Santos de Azevedo",
+            "email": "hnr.azevedo@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "version": "0.0.1",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.4",
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "HnrAzevedo\\Datamanager\\":"src/"
+        }
+    }
+}
