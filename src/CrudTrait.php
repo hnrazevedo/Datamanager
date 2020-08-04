@@ -86,7 +86,8 @@ trait CrudTrait{
     {
         try {
             $stmt = Connect::getInstance()->prepare("DELETE FROM {$this->table} WHERE {$terms}");
-            if ($params) {
+
+            if($params){
                 parse_str($params, $params);
                 $stmt->execute($params);
                 return true;

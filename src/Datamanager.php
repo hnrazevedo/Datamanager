@@ -15,9 +15,10 @@ class Datamanager
     protected array $data = [];
     
     private bool $full = false;
+    private ?string $clause = null;
 
 
-    private array $where = [0=> ["1",'=',"1"] ];
+    private array $where = [''=> ["1",'=',"1"] ];
     private ?string $order = null;
     private ?int $limit = null;
     private ?int $offset = null;
@@ -206,6 +207,8 @@ class Datamanager
         $this->where['AND'] = (array_key_exists('AND',$this->where)) ?? '';
         $w = [];
         foreach ($where as $condition => $values) {
+
+
             if(is_array($values)){
                 if(count($values) != 3){
                     throw new Exception("Condition where set incorrectly: ".implode(' ',$values));
@@ -215,14 +218,15 @@ class Datamanager
                     throw new Exception("{$values[0]} field does not exist in the table {$this->table}.");
                 }
 
-                $this->where[$condition] = $values;
-
-                return $this;
+                $w[(is_int($condition) ? 'AND' : $condition)][] = $values;
+                continue;
+        
             }
-            $w[] = $values;
+            
+            $w['AND'][] = $values;
         }
 
-        $this->where['AND'][] = $w;
+        $this->where = array_merge($this->where,$w);
 
         return $this;
     }
@@ -281,9 +285,52 @@ class Datamanager
         return str_replace(',}', '}', '{'.$string.'}');
     }
 
-    public function remove(): bool
+    public function remove(?bool $exec = false): Datamanager
     {
-        return true;
+        if($exec){
+            $this->clause = null;
+
+            if(count($this->where) == 1){
+                $this->removeById();
+                return $this;
+            }
+
+            $where = '';
+            $data = '';
+            foreach($this->where as $clause => $condition){
+                
+
+                if(strlen($clause) === 0){
+                    $where .= " {$clause} ";
+                    $where .= " {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
+                    $data .= "q_{$condition[0]}={$condition[2]}&";
+                    continue;
+                }
+
+                
+                foreach($condition as $column => $value){
+                    $where .= " {$clause} ";
+                    $where .= " {$value[0]} {$value[1]} :q_{$value[0]} ";
+                    $data .= "q_{$value[0]}={$value[2]}&";
+                }
+            }
+
+            $data = substr($data,0,-1);
+            if(!$this->delete($where,$data)){
+                throw $this->fail;
+            }
+            
+            return $this;
+        }
+
+        $this->clause = 'remove';
+        
+        return $this;
+    }
+
+    private function removeById(): bool
+    {
+        return $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
     }
 
     public function clone(): Datamanager
@@ -304,16 +351,19 @@ class Datamanager
             if($this->data[$key]['changed'] && $this->data[$key]['upgradeable']){
                 $data[$key] = $this->data[$key]['value'];
             }
-
         }
 
-
         $terms = "{$this->primary}=:{$this->primary}";
-        $params = $this->primary.'=:'.$this->getData()[$this->primary]['value'];
+        $params = $this->primary.'='.$this->getData()[$this->primary]['value'];
 
         $this->transaction('begin');
         try{
             $this->update($data, $terms, $params);
+
+            if($this->fail){
+                throw $this->fail;
+            }
+
             $this->transaction('commit');
         }catch(Exception $er){
             $this->transaction('rollback');
@@ -355,7 +405,7 @@ class Datamanager
                 throw $this->fail;
             }
 
-            $this->primary = $id;
+            $this->getData()[$this->primary]['value'] = $id;
             
             $this->transaction('commit');
 
@@ -389,34 +439,25 @@ class Datamanager
 
     public function findById($id): Datamanager
     {
-        $pri = null;
-        foreach ($this->data as $key => $value) {
-            if($this->data[$key]['key'] === 'PRI'){
-                $pri = $key;
-            }
-        }
-
-        if(is_null($pri)){
-            throw new Exception("The {$this->table} table has no primary key");
-        }
-
-        $this->where([$pri,'=',$id]);
-
+        $this->where([$this->primary,'=',$id]);
         return $this;
     }
 
-
-
-    
-
     public function execute(): Datamanager
     {
+        if(!is_null($this->clause)){
+            if($this->clause == 'remove'){
+                return $this->remove(true);
+            }
+        }
+
         $this->deny();
         $select = '';
 
         foreach ($this->select as $key => $value) {
             $select .= "{$key},";
         }
+        
         $select = substr($select,0,-1);
         $this->query = str_replace("*",$select,$this->query);
 

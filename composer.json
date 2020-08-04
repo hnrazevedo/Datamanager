@@ -1,5 +1,5 @@
 {
-    "name": "hnrazevedo/hnrazevedo",
+    "name": "hnrazevedo/datamanager",
     "description": "Tools for developing personal projects",
     "authors": [
         {
@@ -8,8 +8,7 @@
             "role": "Developer"
         }
     ],
-    "version": "0.0.1",
-    "minimum-stability": "dev",
+    "version": "v0.0.1",
     "require": {
         "php": ">=7.4",
         "ext-pdo": "*"
