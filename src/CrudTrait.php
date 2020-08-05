@@ -29,7 +29,8 @@ trait CrudTrait{
             $stmt = Connect::getInstance()->prepare("{$query}");
             $stmt->execute($data);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }catch(Exception $er){
+        }catch(Exception $exception){
+            $this->fail = $exception;
             echo $er->getMessage();
         }
         return [];
@@ -41,7 +42,8 @@ trait CrudTrait{
             $stmt = Connect::getInstance()->prepare("DESCRIBE {$this->table}");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }catch(Exception $er){
+        }catch(Exception $exception){
+            $this->fail = $exception;
             throw $er;
         }
     }
