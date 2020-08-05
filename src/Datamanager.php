@@ -266,8 +266,11 @@ abstract class Datamanager
     public function setByDatabase(array $arrayValues): Datamanager
     {
         $clone = clone $this;
-        $clone->result = [];
-        $clone->result[0] = $this->result[0];
+        
+        $clone->result = [
+            0 => $this->result[0]
+        ];
+
         $clone->count = 1;
 
         foreach ($arrayValues as $key => $value) {
@@ -308,15 +311,12 @@ abstract class Datamanager
             $where = '';
             $data = '';
             foreach($this->where as $clause => $condition){
-                
-
                 if(strlen($clause) === 0){
                     $where .= " {$clause} ";
                     $where .= " {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
                     $data .= "q_{$condition[0]}={$condition[2]}&";
                     continue;
                 }
-
                 
                 foreach($condition as $column => $value){
                     $where .= " {$clause} ";
