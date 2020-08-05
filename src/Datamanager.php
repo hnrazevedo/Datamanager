@@ -20,7 +20,7 @@ abstract class Datamanager
 
     private array $where = [''=> ["1",'=',"1"] ];
     private ?string $order = null;
-    private ?int $limit = null;
+    private ?string $limit = null;
     private ?int $offset = null;
     private array $excepts = [];
     private int $count = 0;
@@ -32,7 +32,13 @@ abstract class Datamanager
     {
         $this->table = $table;
         $this->primary = $primary;
-        $this->mountData($this->describe());
+        $describe = $this->describe();
+        
+        if($this->fail){
+            throw $this->fail;
+        }
+
+        $this->mountData($describe);
         $this->full = true;
         return $this;
     }
@@ -175,7 +181,7 @@ abstract class Datamanager
 
     public function orderBy(string $field, string $ord = 'ASC'): Datamanager
     {
-        if(!array_key_exists($field,$this->data) && $this->create){
+        if(!array_key_exists(str_replace(['asc','ASC','desc','DESC',' '],'',$field),$this->data) && $this->full){
             throw new Exception("{$field} field does not exist in the table {$this->table}.");
         }
 
@@ -192,7 +198,7 @@ abstract class Datamanager
         $params = (is_array($params)) ? $params : [$params];
         $this->select = [];
         foreach ($params as $field) {
-            if(!array_key_exists($field,$this->data) && $this->create){
+            if(!array_key_exists($field,$this->data) && $this->full){
                 throw new Exception("{$field} field does not exist in the table {$this->table}.");
             }
 
@@ -214,7 +220,7 @@ abstract class Datamanager
                     throw new Exception("Condition where set incorrectly: ".implode(' ',$values));
                 }
 
-                if(!array_key_exists($values[0],$this->data) && $this->create){
+                if(!array_key_exists($values[0],$this->data) && $this->full){
                     throw new Exception("{$values[0]} field does not exist in the table {$this->table}.");
                 }
 
@@ -231,7 +237,7 @@ abstract class Datamanager
         return $this;
     }
 
-    public function limit(int $limit): Datamanager
+    public function limit(string $limit): Datamanager
     {
         $this->limit = $limit;
         return $this;
@@ -260,6 +266,10 @@ abstract class Datamanager
     public function setByDatabase(array $arrayValues): Datamanager
     {
         $clone = clone $this;
+        $clone->result = [];
+        $clone->result[0] = $this->result[0];
+        $clone->count = 1;
+
         foreach ($arrayValues as $key => $value) {
 
             if(!array_key_exists($key,$this->data)){
@@ -330,7 +340,13 @@ abstract class Datamanager
 
     private function removeById(): bool
     {
-        return $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
+        $delete = $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
+
+        if($this->fail){
+            throw $this->fail;
+        }
+
+        return $delete;
     }
 
     public function save(): Datamanager
@@ -394,7 +410,7 @@ abstract class Datamanager
            
             $id = $this->insert($data);
 
-            if(!is_null($this->fail)){
+            if($this->fail){
                 throw $this->fail;
             }
 
@@ -485,6 +501,10 @@ abstract class Datamanager
         }
 
         $this->result = $this->select($this->query,$whereData);
+
+        if($this->fail){
+            throw $this->fail;
+        }
 
         $this->count = count($this->result);
         $this->query = null;

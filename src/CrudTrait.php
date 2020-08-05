@@ -43,6 +43,7 @@ trait CrudTrait{
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }catch(Exception $exception){
             $this->fail = $exception;
+            return null;
         }
     }
 

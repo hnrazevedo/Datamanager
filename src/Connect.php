@@ -3,7 +3,7 @@
 namespace HnrAzevedo\Datamanager;
 
 use PDO;
-use PDOException;
+use Exception;
 
 class Connect
 {
@@ -24,7 +24,7 @@ class Connect
                     DATAMANAGER_CONFIG['password'],
                     DATAMANAGER_CONFIG['options']
                 );
-            } catch (PDOException $exception) {
+            } catch (Exception $exception) {
                 throw $exception;
             }
         }
