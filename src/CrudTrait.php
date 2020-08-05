@@ -112,9 +112,4 @@ trait CrudTrait{
         return $filter;
     }
 
-    protected function destroy()
-    {
-        Connect::destroy();
-    }
-
 }

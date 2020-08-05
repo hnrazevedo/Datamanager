@@ -4,7 +4,7 @@ namespace HnrAzevedo\Datamanager;
 
 use Exception;
 
-class Datamanager
+abstract class Datamanager
 {
     use CrudTrait;
 
@@ -259,7 +259,7 @@ class Datamanager
 
     public function setByDatabase(array $arrayValues): Datamanager
     {
-        $clone = $this->clone();
+        $clone = clone $this;
         foreach ($arrayValues as $key => $value) {
 
             if(!array_key_exists($key,$this->data)){
@@ -331,13 +331,6 @@ class Datamanager
     private function removeById(): bool
     {
         return $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
-    }
-
-    public function clone(): Datamanager
-    {
-        $clone = clone $this;
-        $clone->destroy();
-        return $clone;
     }
 
     public function save(): Datamanager
