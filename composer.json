@@ -12,7 +12,7 @@
         "php": ">=7.4",
         "ext-pdo": "*"
     },
-    "license":"proprietary",
+    "license":"MIT",
     "autoload": {
         "psr-4": {
             "HnrAzevedo\\Datamanager\\":"src/"
