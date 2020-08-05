@@ -7,22 +7,18 @@ use PDOException;
 
 class Connect
 {
-    use Config;
-
     private static $instance;
 
     public static function getInstance(): ?PDO
     {
         if (empty(self::$instance)) {
             try {
-                
-                $config = (new self)->config;
-
                 self::$instance = new PDO(
-                    "{$config['driver']}:host={$config['host']};port={$config['port']};dbname={$config['database']};charset={$config['charset']}",
-                    $config['username'],$config['password'],$config['options']
+                    DATAMANAGER_CONFIG['driver'] . ':host='.DATAMANAGER_CONFIG['host'] . ';port='.DATAMANAGER_CONFIG['port'] . ';dbname='.DATAMANAGER_CONFIG['database'] . ';charset='.DATAMANAGER_CONFIG['charset'],
+                    DATAMANAGER_CONFIG['username'],
+                    DATAMANAGER_CONFIG['password'],
+                    DATAMANAGER_CONFIG['options']
                 );
-
             } catch (PDOException $exception) {
                 throw $exception;
             }
