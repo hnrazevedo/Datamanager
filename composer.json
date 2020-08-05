@@ -8,11 +8,11 @@
             "role": "Developer"
         }
     ],
-    "version": "v0.0.3",
     "require": {
         "php": ">=7.4",
         "ext-pdo": "*"
     },
+    "license":"proprietary",
     "autoload": {
         "psr-4": {
             "HnrAzevedo\\Datamanager\\":"src/"
