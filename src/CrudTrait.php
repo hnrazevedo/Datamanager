@@ -8,19 +8,23 @@ use PDO;
 
 trait CrudTrait{
 
-    protected function transaction(string $transaction): ?int
+    protected ?Exception $fail = null;
+
+    protected function check_fail()
+    {
+        if(!is_null($this->fail)){
+            throw $this->fail;
+        }
+    }
+
+    protected function transaction(string $transaction): ?bool
     {
         switch ($transaction) {
-            case 'begin':
-                return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->beginTransaction() : false;
-                break;
-            case 'commit':
-                return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->commit() : false;
-                break;
-            case 'rollback':
-                return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->rollBack() : false;
-                break;
+            case 'begin': return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->beginTransaction() : false;
+            case 'commit': return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->commit() : false;
+            case 'rollback': return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->rollBack() : false;
         }
+        return false;
     }
 
     protected function select(string $query,array $data): ?array

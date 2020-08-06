@@ -8,7 +8,6 @@ abstract class Datamanager
 {
     use CrudTrait;
 
-    private ?Exception $fail = null;
     private ?string $table = null;
     private ?string $primary = null;
     private array $result = [];
@@ -34,9 +33,7 @@ abstract class Datamanager
         $this->primary = $primary;
         $describe = $this->describe();
         
-        if($this->fail){
-            throw $this->fail;
-        }
+        $this->check_fail();
 
         $this->mountData($describe);
         $this->full = true;
@@ -214,27 +211,31 @@ abstract class Datamanager
         $w = [];
         foreach ($where as $condition => $values) {
 
-
-            if(is_array($values)){
-                if(count($values) != 3){
-                    throw new Exception("Condition where set incorrectly: ".implode(' ',$values));
-                }
-
-                if(!array_key_exists($values[0],$this->data) && $this->full){
-                    throw new Exception("{$values[0]} field does not exist in the table {$this->table}.");
-                }
-
-                $w[(is_int($condition) ? 'AND' : $condition)][] = $values;
+            if(!is_array($values)){
+                $w['AND'][] = $values;
                 continue;
-        
             }
-            
-            $w['AND'][] = $values;
+
+            $this->check_where_array($values);
+
+            $w[(is_int($condition) ? 'AND' : $condition)][] = $values;
+                       
         }
 
         $this->where = array_merge($this->where,$w);
 
         return $this;
+    }
+
+    public function check_where_array(array $where)
+    {
+        if(count($where) != 3){
+            throw new Exception("Condition where set incorrectly: ".implode(' ',$where));
+        }
+
+        if(!array_key_exists($where[0],$this->data) && $this->full){
+            throw new Exception("{$where[0]} field does not exist in the table {$this->table}.");
+        }
     }
 
     public function limit(string $limit): Datamanager
@@ -325,10 +326,9 @@ abstract class Datamanager
                 }
             }
 
-            $data = substr($data,0,-1);
-            if(!$this->delete($where,$data)){
-                throw $this->fail;
-            }
+            $this->delete($where, substr($data,0,-1) );
+
+            $this->check_fail();
             
             return $this;
         }
@@ -342,9 +342,7 @@ abstract class Datamanager
     {
         $delete = $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
 
-        if($this->fail){
-            throw $this->fail;
-        }
+        $this->check_fail();
 
         return $delete;
     }
@@ -369,9 +367,7 @@ abstract class Datamanager
         try{
             $this->update($data, $terms, $params);
 
-            if($this->fail){
-                throw $this->fail;
-            }
+            $this->check_fail();
 
             $this->transaction('commit');
         }catch(Exception $er){
@@ -402,17 +398,12 @@ abstract class Datamanager
             $data[$key] = $value['value'];
         }
 
-        $columns = substr($columns,0,-1);
-        $values = substr($values,0,-1);
-
         $this->transaction('begin');
         try{
            
             $id = $this->insert($data);
 
-            if($this->fail){
-                throw $this->fail;
-            }
+            $this->check_fail();
 
             $this->getData()[$this->primary]['value'] = $id;
             
@@ -502,9 +493,7 @@ abstract class Datamanager
 
         $this->result = $this->select($this->query,$whereData);
 
-        if($this->fail){
-            throw $this->fail;
-        }
+        $this->check_fail();
 
         $this->count = count($this->result);
         $this->query = null;
