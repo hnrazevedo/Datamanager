@@ -363,7 +363,7 @@ abstract class Datamanager
                 continue;
             }
 
-            if($this->data[$key]['changed'] && $this->data[$key]['upgradeable'] || $this->primary == $key){
+            if(($this->data[$key]['changed'] && $this->data[$key]['upgradeable']) || $this->primary == $key){
                 $data[$key] = $this->data[$key]['value'];
             }
         }
