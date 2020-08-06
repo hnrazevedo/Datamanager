@@ -194,13 +194,16 @@ abstract class Datamanager
     {
         $params = (is_array($params)) ? $params : [$params];
         $this->select = [];
+
         foreach ($params as $field) {
+
             if(!array_key_exists($field,$this->data) && $this->full){
                 throw new Exception("{$field} field does not exist in the table {$this->table}.");
             }
 
             $this->select[$field] = true;
         }
+        $this->select[$this->primary] = true;
 
         return $this;
     }
@@ -347,15 +350,20 @@ abstract class Datamanager
         return $delete;
     }
 
+    public function check_primaryAuto()
+    {
+
+    }
+
     public function save(): Datamanager
     {
         $data = [];
         foreach ($this->data as $key => $value) {
-            if($this->data[$key]['key'] === 'PRI' || strstr($this->data[$key]['extra'],'auto_increment')){
+            if(strstr($this->data[$key]['extra'],'auto_increment') && $key != $this->primary){
                 continue;
             }
 
-            if($this->data[$key]['changed'] && $this->data[$key]['upgradeable']){
+            if($this->data[$key]['changed'] && $this->data[$key]['upgradeable'] || $this->primary == $key){
                 $data[$key] = $this->data[$key]['value'];
             }
         }
@@ -419,8 +427,6 @@ abstract class Datamanager
 
     public function toEntity()
     {
-        $entity = null;
-
         if($this->getCount() === 0){
             return null;
         }

@@ -13,7 +13,7 @@ $entity = new User();
 try{
     /* Set new info for insert in database */
     $entity->name = 'Henri Azevedo';
-    $entity->email = 'hnr.azevedo@gmail.com';
+    $entity->email = 'hnr.az1eevedo@gmail.com';
     $entity->password = '123456';
 
     /* Insert entity in database */

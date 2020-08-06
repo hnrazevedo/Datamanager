@@ -39,7 +39,7 @@ trait CrudTrait{
         return [];
     }
 
-    protected function describe(): ?array
+    protected function describe(): array
     {
         try{
             $stmt = Connect::getInstance()->prepare("DESCRIBE {$this->table}");
@@ -47,11 +47,11 @@ trait CrudTrait{
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }catch(Exception $exception){
             $this->fail = $exception;
-            return null;
+            return [];
         }
     }
 
-    protected function insert(array $data): ?int
+    protected function insert(array $data): ?string
     {
         try {
             $columns = implode(", ", array_keys($data));
@@ -76,10 +76,11 @@ trait CrudTrait{
                 $dateSet[] = "{$bind} = :{$bind}";
             }
             $dateSet = implode(", ", $dateSet);
-            parse_str($params, $params);
+
+            parse_str($params, $arr);
 
             $stmt = Connect::getInstance()->prepare("UPDATE {$this->table} SET {$dateSet} WHERE {$terms}");
-            $stmt->execute($this->filter(array_merge($data, $params)));
+            $stmt->execute($this->filter(array_merge($data, $arr)));
             return ($stmt->rowCount() ?? 1);
         } catch (PDOException $exception) {
             $this->fail = $exception;
@@ -93,8 +94,8 @@ trait CrudTrait{
             $stmt = Connect::getInstance()->prepare("DELETE FROM {$this->table} WHERE {$terms}");
 
             if($params){
-                parse_str($params, $params);
-                $stmt->execute($params);
+                parse_str($params, $arr);
+                $stmt->execute($arr);
                 return true;
             }
 
