@@ -38,4 +38,13 @@ trait CheckTrait{
         }
     }
 
+    protected function upgradeable(string $field): bool
+    {
+        return (($this->data[$field]['changed'] && $this->data[$field]['upgradeable']) || $this->primary === $field);
+    }
+
+    protected function isIncremented(string $field): bool
+    {
+        return ( strstr($this->data[$field]['extra'],'auto_increment') && $field !== $this->primary );
+    }
 }

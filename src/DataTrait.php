@@ -44,11 +44,7 @@ trait DataTrait{
         $return = ['data' => []];
 
         foreach ($this->data as $key => $value) {
-            if(strstr($this->data[$key]['extra'],'auto_increment') && $key !== $this->primary){
-                continue;
-            }
-
-            if(($this->data[$key]['changed'] && $this->data[$key]['upgradeable']) || $this->primary === $key){
+            if($this->upgradeable($key) && !$this->isIncremented($key)){
                 $return['data'][$key] = $this->data[$key]['value'];
             }
         }

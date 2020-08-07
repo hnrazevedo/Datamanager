@@ -27,7 +27,6 @@ try{
     $name = $user->name;
     $email = $user->email;
 
-    
     /* OR */
     $name = $entity->find()->only('name')->execute()->first()->name;
 
