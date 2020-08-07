@@ -8,6 +8,11 @@ trait DataTrait{
     protected ?string $table = null;
     protected ?string $primary = null;
 
+    protected array $result = [];
+    protected array $data = [];
+    protected bool $full = false;
+    protected ?string $clause = null;
+
     protected ?string $order = null;
     protected ?string $limit = null;
     protected ?int $offset = null;
@@ -16,7 +21,7 @@ trait DataTrait{
     protected array $select = [];
     protected ?string $query = null;
 
-    protected function create(string $table, string $primary): Datamanager
+    protected function create(string $table, string $primary)
     {
         $this->table = $table;
         $this->primary = $primary;
@@ -29,7 +34,7 @@ trait DataTrait{
         return $this;
     }
 
-    public function __set(string $prop,$value): Datamanager
+    public function __set(string $prop,$value)
     {
 
         if(is_array($value)){
@@ -67,7 +72,7 @@ trait DataTrait{
         return $this->count;
     }
 
-    public function except($deniable): Datamanager
+    public function except($deniable)
     {
         $deniable = (is_array($deniable)) ? $deniable : [$deniable];
 
@@ -82,7 +87,7 @@ trait DataTrait{
         return $this;
     }
 
-    public function deny(): Datamanager
+    public function deny()
     {
         foreach ($this->excepts as $field => $value) {
             unset($this->select[$field]);
@@ -90,7 +95,7 @@ trait DataTrait{
         return $this;
     }
 
-    public function orderBy(string $field, string $ord = 'ASC'): Datamanager
+    public function orderBy(string $field, string $ord = 'ASC')
     {
         if(!array_key_exists(str_replace(['asc','ASC','desc','DESC',' '],'',$field),$this->data) && $this->full){
             throw new Exception("{$field} field does not exist in the table {$this->table}.");
@@ -104,7 +109,7 @@ trait DataTrait{
         return $this;
     }
 
-    public function only($params): Datamanager
+    public function only($params)
     {
         $params = (is_array($params)) ? $params : [$params];
         $this->select = [];
@@ -122,7 +127,7 @@ trait DataTrait{
         return $this;
     }
 
-    public function where(array $where): Datamanager
+    public function where(array $where)
     {
         $this->where['AND'] = (array_key_exists('AND',$this->where)) ?? '';
         $w = [];
@@ -144,13 +149,13 @@ trait DataTrait{
         return $this;
     }
 
-    public function limit(string $limit): Datamanager
+    public function limit(string $limit)
     {
         $this->limit = $limit;
         return $this;
     }
 
-    public function offset(int $offset): Datamanager
+    public function offset(int $offset)
     {
         if(is_null($this->limit)){
             throw new Exception("The limit must be set before the offset.");
@@ -165,12 +170,12 @@ trait DataTrait{
         return $this->result;
     }
 
-    public function first(): Datamanager
+    public function first()
     {
         return  (count($this->result) > 0) ? $this->setByDatabase($this->result[0]) : $this;
     }
 
-    public function setByDatabase(array $arrayValues): Datamanager
+    public function setByDatabase(array $arrayValues)
     {
         $clone = clone $this;
         
@@ -205,7 +210,7 @@ trait DataTrait{
         return str_replace(',}', '}', '{'.$string.'}');
     }
 
-    public function remove(?bool $exec = false): Datamanager
+    public function remove(?bool $exec = false)
     {
         if(!$exec){
             $this->clause = 'remove';    
@@ -235,7 +240,7 @@ trait DataTrait{
         return $delete;
     }
 
-    public function persist(): Datamanager
+    public function persist()
     {
         $columns = '';
         $values = '';
@@ -292,13 +297,13 @@ trait DataTrait{
         return $entity;
     }
 
-    public function findById($id): Datamanager
+    public function findById($id)
     {
         $this->where([$this->primary,'=',$id]);
         return $this;
     }
 
-    public function execute(): Datamanager
+    public function execute()
     {
         if(!is_null($this->clause) && $this->clause == 'remove'){
             return $this->remove(true);
@@ -326,7 +331,7 @@ trait DataTrait{
         return $this;
     }
 
-    public function find(?int $key = null): Datamanager
+    public function find(?int $key = null)
     {
         $this->query = " SELECT * FROM {$this->table} ";
 

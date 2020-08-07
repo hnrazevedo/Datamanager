@@ -7,12 +7,8 @@ use Exception;
 abstract class Datamanager
 {
     use CrudTrait, DataTrait;
-
-    private array $result = [];
-    protected array $data = [];
     
-    private bool $full = false;
-    private ?string $clause = null;
+    
 
     private array $where = [''=> ["1",'=',"1"] ];
 
