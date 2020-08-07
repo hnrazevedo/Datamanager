@@ -15,5 +15,7 @@ define("DATAMANAGER_CONFIG", [
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
         PDO::ATTR_CASE => PDO::CASE_NATURAL,
         PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING
-    ]
+    ],
+
+    "dateformat" => "d/m/Y"
 ]);

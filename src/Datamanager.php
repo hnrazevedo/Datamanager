@@ -21,6 +21,14 @@ abstract class Datamanager
             return $this;
         }
 
+        if($this->full){
+            switch($this->data[$prop]['type']){
+                case 'date':
+                    $value = (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value) , 'Y-m-d'));
+                    break;
+            }
+        }
+
         $this->isSettable($prop);
 
         $this->data[$prop]['changed'] = true;
@@ -37,6 +45,13 @@ abstract class Datamanager
     public function __get(string $field)
     {
         $this->isSettable($field);
+
+        if($this->full){
+            switch($this->data[$field]['type']){
+                case 'date': $this->data[$field]['value'] = (date_format( date_create_from_format('Y-m-d' , $this->data[$field]['value'] ) , DATAMANAGER_CONFIG['dateformat']));
+            }
+        }
+
         return $this->data[$field]['value'];
     }
 

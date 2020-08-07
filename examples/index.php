@@ -16,9 +16,13 @@ try{
     $entity->name = 'Henri Azevedo';
     $entity->email = 'hnr.azevedo@gmail.com';
     $entity->password = '123456';
+    $entity->birth = '28/09/1996';
+    $entity->register = date('Y-m-d H:i:s');
 
     /* Insert entity in database */
     $entity->persist();
+
+    die();
 
     /* Find by primary key */
     $user = $entity->find()->execute()->first()->toEntity();
