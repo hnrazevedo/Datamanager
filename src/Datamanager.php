@@ -6,7 +6,7 @@ use Exception;
 
 abstract class Datamanager
 {
-    use DataTrait, SynchronizeTrait;
+    use DataTrait, SynchronizeTrait, EntityTrait;
 
     protected ?string $table = null;
     protected ?string $primary = null;
@@ -15,7 +15,6 @@ abstract class Datamanager
 
     public function __set(string $prop,$value)
     {
-
         if(is_array($value)){
             $attr = array_keys($value)[0];
             $this->data[$prop][$attr] = $value[$attr];
@@ -175,27 +174,6 @@ abstract class Datamanager
         return str_replace(',}', '}', '{'.$string.'}');
     }
 
-    public function remove(?bool $exec = false)
-    {
-        if($exec !== null){
-            $this->clause = 'remove';    
-            return $this;
-        }
-
-        $this->clause = null;
-
-        if(count($this->where) == 1){
-            $this->removeById();
-            return $this;
-        }
-
-        $this->delete($this->mountRemove()['where'], substr( $this->mountRemove()['data'] ,0,-1) );
-
-        $this->check_fail();
-            
-        return $this;
-    }
-
     private function removeById(): bool
     {
         $delete = $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
@@ -203,61 +181,6 @@ abstract class Datamanager
         $this->check_fail();
 
         return $delete;
-    }
-
-    public function persist()
-    {
-        $columns = '';
-        $values = '';
-        $data = [];
-
-        foreach ($this->data as $key => $value) {
-            if(strstr($this->data[$key]['extra'],'auto_increment')){
-                continue;
-            }
-
-            $this->checkMaxlength($key, $value['value'], $value['maxlength']);
-
-            $columns .= $key.',';
-            $values .= ':'.$key.',';
-            $data[$key] = $value['value'];
-        }
-
-        $this->transaction('begin');
-        try{
-           
-            $id = $this->insert($data);
-
-            $this->check_fail();
-
-            $this->getData()[$this->primary]['value'] = $id;
-            
-            $this->transaction('commit');
-
-        }catch(Exception $er){
-            $this->transaction('rollback');
-            throw $er;
-        }
-
-        return $this;
-    }
-
-    public function toEntity()
-    {
-        if($this->getCount() === 0){
-            return null;
-        }
-
-        $entity = $this->setByDatabase($this->result[0]);
-
-        if(count($this->result) > 1){
-            $entity = [];
-            foreach ($this->result as $key => $value) {
-                $entity[] = $this->setByDatabase($value);
-            }
-        }
-
-        return $entity;
     }
 
     public function findById($id)
@@ -299,26 +222,6 @@ abstract class Datamanager
         return (is_int($key)) ? $this->findById($key) : $this;
     }
 
-    public function save()
-    {
-        $this->transaction('begin');
-
-        try{
-            $this->update(
-                $this->mountSave()['data'],
-                "{$this->primary}=:{$this->primary}", 
-                $this->primary.'='.$this->getData()[$this->primary]['value']
-            );
-
-            $this->check_fail();
-
-            $this->transaction('commit');
-        }catch(Exception $er){
-            $this->transaction('rollback');
-            throw $er;
-        }
-
-        return $this;
-    }
+    
     
 }
