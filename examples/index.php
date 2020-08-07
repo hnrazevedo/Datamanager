@@ -36,7 +36,6 @@ try{
 
     /* Upload by primary key from the uploaded entity */
     $user->save();
-
     /* Remove by primary key from the uploaded entity */
     $user->remove(true);
     /* OR */
