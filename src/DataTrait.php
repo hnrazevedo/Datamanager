@@ -5,6 +5,8 @@ namespace HnrAzevedo\Datamanager;
 use Exception;
 
 trait DataTrait{
+    use CrudTrait;
+    
     protected ?string $table = null;
     protected ?string $primary = null;
 

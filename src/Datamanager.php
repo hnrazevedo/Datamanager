@@ -6,10 +6,8 @@ use Exception;
 
 abstract class Datamanager
 {
-    use CrudTrait, DataTrait;
+    use DataTrait;
     
-    
-
     private array $where = [''=> ["1",'=',"1"] ];
 
     private function mountTable_Field(string $field, $value = null)
