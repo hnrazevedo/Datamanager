@@ -41,7 +41,6 @@ trait SynchronizeTrait{
     protected function mountTable_Type(string $field, $value = null)
     {
         $type = $value;
-        $maxlength = null;
 
         if(strpos($value,'(')){
             $type = (in_array( substr($value, 0, strpos($value,'(')) , ['varchar','char','text'])) ? 'string' : $type;
@@ -49,13 +48,17 @@ trait SynchronizeTrait{
             $type = (in_array( substr($value, 0, strpos($value,'(')) , ['decimal','float','double','real'])) ? 'float' : $type;
         }
 
-        $maxlength = (in_array( $type , ['string','float','int'])) ? substr($value,(strpos($value,'(')+1),-1) : $maxlength;
+        $this->mountTable_Maxlength($field, $type, $value);
+        $this->$field = ['type' => $type];
+    }
+
+    protected function mountTable_Maxlength(string $field, string $type, $default = null)
+    {
+        $maxlength = (in_array( $type , ['string','float','int'])) ? substr($default,(strpos($default,'(')+1),-1) : 0;
         $maxlength = (in_array( $type , ['date'])) ? 10 : $maxlength;
         $maxlength = (in_array( $type , ['datetime'])) ? 19 : $maxlength;
         $maxlength = (in_array( $type , ['boolean'])) ? 1 : $maxlength;
-
         $this->$field = ['maxlength' => $maxlength];
-        $this->$field = ['type' => $type];
     }
 
     protected function mountTable_Null(string $field, $value = null)

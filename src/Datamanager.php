@@ -177,7 +177,7 @@ abstract class Datamanager
 
     public function remove(?bool $exec = false)
     {
-        if(!$exec){
+        if($exec !== null){
             $this->clause = 'remove';    
             return $this;
         }
