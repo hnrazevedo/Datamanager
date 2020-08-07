@@ -4,6 +4,7 @@ namespace HnrAzevedo\Datamanager;
 
 use PDO;
 use Exception;
+use HnrAzevedo\Datamanager\DatamanagerException;
 
 class Connect
 {
@@ -15,7 +16,7 @@ class Connect
             try {
 
                 if(!defined('DATAMANAGER_CONFIG')){
-                    throw new Exception("Information for connection to the database not defined.");
+                    throw new DatamanagerException("Information for connection to the database not defined.");
                 }
 
                 self::$instance = new PDO(
@@ -25,7 +26,7 @@ class Connect
                     DATAMANAGER_CONFIG['options']
                 );
             } catch (Exception $exception) {
-                throw $exception;
+                throw new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
             }
         }
         return self::$instance;

@@ -2,13 +2,13 @@
 
 namespace HnrAzevedo\Datamanager;
 
+use HnrAzevedo\Datamanager\DatamanagerException;
 use Exception;
-use PDOException;
 use PDO;
 
 trait CrudTrait{
 
-    protected ?Exception $fail = null;
+    protected ?DatamanagerException $fail = null;
 
     protected function check_fail()
     {
@@ -20,7 +20,7 @@ trait CrudTrait{
     protected function transaction(string $transaction): ?bool
     {
         if(array_key_exists($transaction,['begin','commit','rollback'])){
-            throw new Exception("{$transaction} é um estado inválido para transações.");
+            throw new DatamanagerException("{$transaction} é um estado inválido para transações.");
         }
 
         if(!Connect::getInstance()->inTransaction()){
@@ -41,7 +41,7 @@ trait CrudTrait{
             $stmt->execute($data);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }catch(Exception $exception){
-            $this->fail = $exception;
+            $this->fail = new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
         }
         return [];
     }
@@ -53,7 +53,7 @@ trait CrudTrait{
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }catch(Exception $exception){
-            $this->fail = $exception;
+            $this->fail = new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
             return [];
         }
     }
@@ -69,8 +69,11 @@ trait CrudTrait{
             $stmt->execute($this->filter($data));
 
             return Connect::getInstance()->lastInsertId();
-        } catch (PDOException $exception) {
-            $this->fail = $exception;
+        } catch (Exception $exception) {
+
+
+
+            $this->fail = new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
             return null;
         }
     }
@@ -89,8 +92,8 @@ trait CrudTrait{
             $stmt = Connect::getInstance()->prepare("UPDATE {$this->table} SET {$dateSet} WHERE {$terms}");
             $stmt->execute($this->filter(array_merge($data, $arr)));
             return ($stmt->rowCount() ?? 1);
-        } catch (PDOException $exception) {
-            $this->fail = $exception;
+        } catch (Exception $exception) {
+            $this->fail = new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
             return null;
         }
     }
@@ -108,8 +111,8 @@ trait CrudTrait{
 
             $stmt->execute();
             return true;
-        } catch (PDOException $exception) {
-            $this->fail = $exception;
+        } catch (Exception $exception) {
+            $this->fail = new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
             return false;
         }
     }

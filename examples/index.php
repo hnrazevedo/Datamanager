@@ -6,6 +6,7 @@ require __DIR__.'/Models/User.php';
 
 /* NOTE: in case of error an exception is thrown */
 
+use HnrAzevedo\Datamanager\DatamanagerException;
 use Model\User;
 
 $entity = new User();
@@ -46,8 +47,9 @@ try{
         ['name','=','Other Name'],
         'OR' => ['email','LIKE','otheremail@gmail.com']
     ])->execute();
-}catch(Exception $er){
+}catch(DatamanagerException $er){
 
+    //var_dump($er);
     die("Code Error: {$er->getCode()}, Line: {$er->getLine()}, File: {$er->getFile()}, Message: {$er->getMessage()}.");
 
 }

@@ -2,7 +2,7 @@
 
 namespace HnrAzevedo\Datamanager;
 
-use Exception;
+use HnrAzevedo\Datamanager\DatamanagerException;
 
 trait EntityTrait{
     public function toEntity()
@@ -52,7 +52,7 @@ trait EntityTrait{
             
             $this->transaction('commit');
 
-        }catch(Exception $er){
+        }catch(DatamanagerException $er){
             $this->transaction('rollback');
             throw $er;
         }
@@ -95,7 +95,7 @@ trait EntityTrait{
             $this->check_fail();
 
             $this->transaction('commit');
-        }catch(Exception $er){
+        }catch(DatamanagerException $er){
             $this->transaction('rollback');
             throw $er;
         }

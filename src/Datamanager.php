@@ -2,7 +2,7 @@
 
 namespace HnrAzevedo\Datamanager;
 
-use Exception;
+use HnrAzevedo\Datamanager\DatamanagerException;
 
 abstract class Datamanager
 {
@@ -51,7 +51,7 @@ abstract class Datamanager
 
         foreach ($deniable as $field) {
             if(!array_key_exists($field,$this->data)){
-                throw new Exception("{$field} field does not exist in the table {$this->table}.");
+                throw new DatamanagerException("{$field} field does not exist in the table {$this->table}.");
             }
 
             $this->excepts[$field] = true;
