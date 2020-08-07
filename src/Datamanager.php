@@ -15,7 +15,6 @@ abstract class Datamanager
     private ?string $clause = null;
 
     private array $where = [''=> ["1",'=',"1"] ];
-    
 
     private function mountTable_Field(string $field, $value = null)
     {
@@ -28,15 +27,15 @@ abstract class Datamanager
         $maxlength = null;
 
         if(strpos($value,'(')){
-            $type = (array_key_exists( substr($value,0,strpos($value,'(')) , ['varchar','char','text'])) ? 'string' : $type;
-            $type = (array_key_exists( substr($value,0,strpos($value,'(')) , ['tinyint','mediumint','smallint','bigtint','int'])) ? 'int' : $type;
-            $type = (array_key_exists( substr($value,0,strpos($value,'(')) , ['decimal','float','double','real'])) ? 'float' : $type;
+            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['varchar','char','text'])) ? 'string' : $type;
+            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['tinyint','mediumint','smallint','bigtint','int'])) ? 'int' : $type;
+            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['decimal','float','double','real'])) ? 'float' : $type;
         }
 
-        $maxlength = (array_key_exists( $type , ['string','float','int'])) ? substr($value,(strpos($value,'(')+1),-1) : $maxlength;
-        $maxlength = (array_key_exists( $type , ['date'])) ? 10 : $maxlength;
-        $maxlength = (array_key_exists( $type , ['datetime'])) ? 19 : $maxlength;
-        $maxlength = (array_key_exists( $type , ['boolean'])) ? 1 : $maxlength;
+        $maxlength = (in_array( $type , ['string','float','int'])) ? substr($value,(strpos($value,'(')+1),-1) : $maxlength;
+        $maxlength = (in_array( $type , ['date'])) ? 10 : $maxlength;
+        $maxlength = (in_array( $type , ['datetime'])) ? 19 : $maxlength;
+        $maxlength = (in_array( $type , ['boolean'])) ? 1 : $maxlength;
 
         $this->$field = ['maxlength' => $maxlength];
         $this->$field = ['type' => $type];
@@ -90,7 +89,7 @@ abstract class Datamanager
 
     private function mountRemove(): array
     {
-        $return = ['data' => [], 'where' => []];
+        $return = ['data' => [], 'where' => ''];
         foreach($this->where as $clause => $condition){
             if(strlen($clause) === 0){
                 $return['where'] .= " {$clause} {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
@@ -147,7 +146,7 @@ abstract class Datamanager
 
     private function mountWhereExec(): array
     {
-        $return = ['where' => [], 'data' => []];
+        $return = ['where' => '', 'data' => []];
 
         foreach ($this->where as $key => $value) {
 
