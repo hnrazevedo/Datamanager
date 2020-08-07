@@ -289,7 +289,7 @@ abstract class Datamanager
 
     private function mountRemove(): array
     {
-        $return = ['data' => null, 'where' => null];
+        $return = ['data' => [], 'where' => []];
         foreach($this->where as $clause => $condition){
             if(strlen($clause) === 0){
                 $return['where'] .= " {$clause} {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
@@ -337,7 +337,7 @@ abstract class Datamanager
 
     private function mountSave(): array
     {
-        $return = ['data' => null];
+        $return = ['data' => []];
 
         foreach ($this->data as $key => $value) {
             if(strstr($this->data[$key]['extra'],'auto_increment') && $key !== $this->primary){
@@ -440,7 +440,7 @@ abstract class Datamanager
 
     private function mountWhereExec(): array
     {
-        $return = ['where' => null, 'data' => null];
+        $return = ['where' => [], 'data' => []];
 
         foreach ($this->where as $key => $value) {
 
