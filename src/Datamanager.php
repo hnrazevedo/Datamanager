@@ -40,76 +40,61 @@ abstract class Datamanager
         return $this;
     }
 
+    private function mountTable_Field(string $field, $value = null)
+    {
+        $this->$field = null;
+    }
+
+    private function mountTable_Type(string $field, $value = null)
+    {
+        $type = $value;
+        $maxlength = null;
+
+        if(strpos($value,'(')){
+            $type = (array_key_exists( substr($value,0,strpos($value,'(')) , ['varchar','char','text'])) ? 'string' : $type;
+            $type = (array_key_exists( substr($value,0,strpos($value,'(')) , ['tinyint','mediumint','smallint','bigtint','int'])) ? 'int' : $type;
+            $type = (array_key_exists( substr($value,0,strpos($value,'(')) , ['decimal','float','double','real'])) ? 'float' : $type;
+        }
+
+        $maxlength = (array_key_exists( $type , ['string','float','int'])) ? substr($value,(strpos($value,'(')+1),-1) : $maxlength;
+        $maxlength = (array_key_exists( $type , ['date'])) ? 10 : $maxlength;
+        $maxlength = (array_key_exists( $type , ['datetime'])) ? 19 : $maxlength;
+        $maxlength = (array_key_exists( $type , ['boolean'])) ? 1 : $maxlength;
+
+        $this->$field = ['maxlength' => $maxlength];
+        $this->$field = ['type' => $type];
+    }
+
+    private function mountTable_Null(string $field, $value = null)
+    {
+        $this->$field = ['null' => ($value === 'YES') ? 1 : 0];
+    }
+
+    private function mountTable_Key(string $field, $value = null)
+    {
+        $this->$field = ['key' => $value];
+        $this->$field = ['upgradeable' => ($value == 'PRI') ? 0 : 1];
+    }
+
+    private function mountTable_Extra(string $field, $value = null)
+    {
+        $this->$field = ['extra' => $value];
+    }
+
+    private function mountTable_Default(string $field, $value = null)
+    {
+        $this->$field = ['default' => $value];
+        $this->$field = ['value' => null];
+        $this->$field = ['changed' => false];
+        $this->select[$field] = true;
+    }
+
     private function mountData(array $table): Datamanager
     {
         foreach ($table as $column) {
-            $field = null;
             foreach ($column as $propriety => $value) {
-                switch ($propriety) {
-                    case 'Field':
-                        $field = $value;
-                        $this->$field = null;
-                        break;
-                    case 'Type':
-                        $type = $value;
-
-                        if(strpos($value,'(')){
-                            switch (substr($value,0,strpos($value,'('))) {
-                                case 'varchar':
-                                case 'char':
-                                case 'text': $type = 'string'; break;
-                                case 'tinyint':
-                                case 'mediumint':
-                                case 'smallint':
-                                case 'bigint':
-                                case 'int': $type = 'int'; break;
-                                case 'decimal':
-                                case 'float':
-                                case 'double':
-                                case 'real': $type = 'float'; break;
-                                default: $type = $value; break;
-                            }
-                        }
-
-                        switch ($type) {
-                            case 'string':
-                            case 'float':
-                            case 'int':
-                                $this->$field = ['maxlength' => substr($value,(strpos($value,'(')+1),-1) ]; 
-                                break;
-                            case 'date':
-                                $this->$field = ['maxlength' => 10];
-                                break;
-                            case 'datetime':
-                                $this->$field = ['maxlength' => 19];
-                                break;
-                            case 'boolean':
-                                $this->$field = ['maxlength' => 1];
-                                break;
-                            default:
-                                $this->$field = ['maxlength' => null];
-                                break;
-                        }
-
-                        $this->$field = ['type' => $type];
-                        break;
-                    case 'Null':
-                        $this->$field = ['null' => ($value === 'YES') ? 1 : 0];
-                        break;
-                    case 'Key':
-                        $this->$field = ['key' => $value];
-                        $this->$field = ['upgradeable' => ($value == 'PRI') ? 0 : 1];
-                        break;
-                    case 'Extra':
-                        $this->$field = ['extra' => $value];
-                        break;
-                    case 'Default':
-                        $this->$field = ['default' => $value];
-                        $this->$field = ['value' => null];
-                        $this->$field = ['changed' => false];
-                        $this->select[$field] = true;
-                        break;
-                }
+                $method = "mountTable_{$propriety}";
+                $this->$method($column['Field'], $value);
             }
         }
         return $this;
@@ -304,7 +289,7 @@ abstract class Datamanager
 
     private function mountRemove(): array
     {
-        $return = ['data' => '', 'where' => ''];
+        $return = ['data' => null, 'where' => null];
         foreach($this->where as $clause => $condition){
             if(strlen($clause) === 0){
                 $return['where'] .= " {$clause} {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
@@ -350,14 +335,9 @@ abstract class Datamanager
         return $delete;
     }
 
-    public function check_primaryAuto()
-    {
-
-    }
-
     private function mountSave(): array
     {
-        $return = ['data' => ''];
+        $return = ['data' => null];
 
         foreach ($this->data as $key => $value) {
             if(strstr($this->data[$key]['extra'],'auto_increment') && $key !== $this->primary){
@@ -460,7 +440,7 @@ abstract class Datamanager
 
     private function mountWhereExec(): array
     {
-        $return = ['where' => '', 'data' => ''];
+        $return = ['where' => null, 'data' => null];
 
         foreach ($this->where as $key => $value) {
 
@@ -501,7 +481,7 @@ abstract class Datamanager
         $this->mountLimit();
         $this->mountOffset();
 
-        $this->result = $this->select($this->query, $this->mountWhereExec['data']);
+        $this->result = $this->select($this->query, $this->mountWhereExec()['data']);
 
         $this->check_fail();
 
@@ -513,7 +493,7 @@ abstract class Datamanager
 
     private function mountSelect()
     {
-        $select = substr(implode(',',array_keys($this->select)), 0, -1);
+        $select = implode(',',array_keys($this->select));
 
         $this->query = str_replace('*', $select,$this->query);
     }

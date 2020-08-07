@@ -13,7 +13,7 @@ $entity = new User();
 try{
     /* Set new info for insert in database */
     $entity->name = 'Henri Azevedo';
-    $entity->email = 'hnr.az1eevedo@gmail.com';
+    $entity->email = 'hnr.azevedo@gmail.com';
     $entity->password = '123456';
 
     /* Insert entity in database */
@@ -48,7 +48,7 @@ try{
     ])->execute();
 }catch(Exception $er){
 
-    die($er->getCode().'  -  '.$er->getMessage());
+    die("Code Error: {$er->getCode()}, Line: {$er->getLine()}, File: {$er->getFile()}, Message: {$er->getMessage()}.");
 
 }
 
