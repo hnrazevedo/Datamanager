@@ -302,42 +302,42 @@ abstract class Datamanager
         return str_replace(',}', '}', '{'.$string.'}');
     }
 
+    private function mountRemove(): array
+    {
+        $return = ['data' => '', 'where' => ''];
+        foreach($this->where as $clause => $condition){
+            if(strlen($clause) === 0){
+                $return['where'] .= " {$clause} {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
+                $return['data'] .= "q_{$condition[0]}={$condition[2]}&";
+                continue;
+            }
+                
+            foreach($condition as $value){
+                $return['where'] .= " {$clause} {$value[0]} {$value[1]} :q_{$value[0]} ";
+                $return['data'] .= "q_{$value[0]}={$value[2]}&";
+            }
+        }
+        return $return;
+    }   
+
     public function remove(?bool $exec = false): Datamanager
     {
-        if($exec){
-            $this->clause = null;
-
-            if(count($this->where) == 1){
-                $this->removeById();
-                return $this;
-            }
-
-            $where = '';
-            $data = '';
-            foreach($this->where as $clause => $condition){
-                if(strlen($clause) === 0){
-                    $where .= " {$clause} ";
-                    $where .= " {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
-                    $data .= "q_{$condition[0]}={$condition[2]}&";
-                    continue;
-                }
-                
-                foreach($condition as $column => $value){
-                    $where .= " {$clause} ";
-                    $where .= " {$value[0]} {$value[1]} :q_{$value[0]} ";
-                    $data .= "q_{$value[0]}={$value[2]}&";
-                }
-            }
-
-            $this->delete($where, substr($data,0,-1) );
-
-            $this->check_fail();
-            
+        if(!$exec){
+            $this->clause = 'remove';    
             return $this;
         }
 
-        $this->clause = 'remove';
-        
+        $this->clause = null;
+
+        if(count($this->where) == 1){
+            $this->removeById();
+            return $this;
+        }
+
+        $this->delete($this->mountRemove()['where'], substr( $this->mountRemove()['data'] ,0,-1) );
+
+        $this->check_fail();
+            
         return $this;
     }
 
@@ -355,25 +355,34 @@ abstract class Datamanager
 
     }
 
-    public function save(): Datamanager
+    private function mountSave(): array
     {
-        $data = [];
+        $return = ['data' => ''];
+
         foreach ($this->data as $key => $value) {
-            if(strstr($this->data[$key]['extra'],'auto_increment') && $key != $this->primary){
+            if(strstr($this->data[$key]['extra'],'auto_increment') && $key !== $this->primary){
                 continue;
             }
 
-            if(($this->data[$key]['changed'] && $this->data[$key]['upgradeable']) || $this->primary == $key){
-                $data[$key] = $this->data[$key]['value'];
+            if(($this->data[$key]['changed'] && $this->data[$key]['upgradeable']) || $this->primary === $key){
+                $return['data'][$key] = $this->data[$key]['value'];
             }
         }
 
-        $terms = "{$this->primary}=:{$this->primary}";
-        $params = $this->primary.'='.$this->getData()[$this->primary]['value'];
+        return $return;
+    }
 
+    public function save(): Datamanager
+    {
+        
         $this->transaction('begin');
+
         try{
-            $this->update($data, $terms, $params);
+            $this->update(
+                $this->mountSave()['data'],
+                "{$this->primary}=:{$this->primary}", 
+                $this->primary.'='.$this->getData()[$this->primary]['value']
+            );
 
             $this->check_fail();
 
@@ -449,55 +458,50 @@ abstract class Datamanager
         return $this;
     }
 
+    private function mountWhereExec(): array
+    {
+        $return = ['where' => '', 'data' => ''];
+
+        foreach ($this->where as $key => $value) {
+
+            $key = (!$key) ? '' : " {$key} ";
+
+            if(is_array($value[0])){
+
+                foreach ($value as $k => $v) {
+                    $return['where'] .= " {$key} {$v[0]} {$v[1]} :q_{$v[0]} ";
+                    $return['data']["q_{$v[0]}"] = $v[2];
+                }
+
+                continue;
+            }
+             
+            $return['where'] .= " {$key} {$value[0]} {$value[1]} :q_{$value[0]} ";
+            $return['data']["q_{$value[0]}"] = $value[2];
+
+        }
+        return $return;
+    }
+
     public function execute(): Datamanager
     {
-        if(!is_null($this->clause)){
-            if($this->clause == 'remove'){
-                return $this->remove(true);
-            }
+        if(!is_null($this->clause) && $this->clause == 'remove'){
+            return $this->remove(true);
         }
 
         $this->deny();
-        $select = '';
-
-        foreach ($this->select as $key => $value) {
-            $select .= "{$key},";
-        }
         
-        $select = substr($select,0,-1);
-        $this->query = str_replace("*",$select,$this->query);
-
-        $where = '';
-        $whereData = [];
-        foreach ($this->where as $key => $value) {
-            $key = (!$key) ? '' : " {$key} ";
-
-            
-            if(is_array($value[0])){
-                foreach ($value as $k => $v) {
-                    $where .= " {$key} {$v[0]} {$v[1]} :q_{$v[0]} ";
-                    $whereData["q_{$v[0]}"] = $v[2];
-                }
-            }else{
-                $where .= " {$key} {$value[0]} {$value[1]} :q_{$value[0]} ";
-                $whereData["q_{$value[0]}"] = $value[2];
-            }
-
-        }
-        $where = substr($where,0,-1);
+        $this->mountSelect();
+        
+        $where = substr($this->mountWhereExec()['where'],0,-1);
         $this->query .= " WHERE {$where} ";
 
         $this->query .= $this->order;
+       
+        $this->mountLimit();
+        $this->mountOffset();
 
-        if(!is_null($this->limit)){
-            $this->query .= " LIMIT {$this->limit}";
-        }
-
-        if(!is_null($this->offset)){
-            $this->query .= " OFFSET {$this->offset}";
-        }
-
-        $this->result = $this->select($this->query,$whereData);
+        $this->result = $this->select($this->query, $this->mountWhereExec['data']);
 
         $this->check_fail();
 
@@ -505,6 +509,27 @@ abstract class Datamanager
         $this->query = null;
 
         return $this;
+    }
+
+    private function mountSelect()
+    {
+        $select = substr(implode(',',array_keys($this->select)), 0, -1);
+
+        $this->query = str_replace('*', $select,$this->query);
+    }
+
+    private function mountLimit()
+    {
+        if(!is_null($this->limit)){
+            $this->query .= " LIMIT {$this->limit}";
+        }
+    }
+
+    private function mountOffset()
+    {
+        if(!is_null($this->offset)){
+            $this->query .= " OFFSET {$this->offset}";
+        }
     }
 
     public function find(?int $key = null): Datamanager

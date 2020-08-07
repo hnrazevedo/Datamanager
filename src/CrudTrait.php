@@ -19,10 +19,17 @@ trait CrudTrait{
 
     protected function transaction(string $transaction): ?bool
     {
+        if(array_key_exists($transaction,['begin','commit','rollback'])){
+            throw new Exception("{$transaction} é um estado inválido para transações.");
+        }
+
+        if(!Connect::getInstance()->inTransaction()){
+           return Connect::getInstance()->beginTransaction();
+        }
+
         switch ($transaction) {
-            case 'begin': return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->beginTransaction() : false;
-            case 'commit': return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->commit() : false;
-            case 'rollback': return (Connect::getInstance()->inTransaction()) ? Connect::getInstance()->rollBack() : false;
+            case 'commit': return Connect::getInstance()->commit();
+            case 'rollback': return Connect::getInstance()->rollBack();
         }
         return false;
     }
