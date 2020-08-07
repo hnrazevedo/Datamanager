@@ -5,14 +5,16 @@ namespace HnrAzevedo\Datamanager;
 use Exception;
 
 trait DataTrait{
-    use CrudTrait;
-    
+    use CrudTrait, CheckTrait;
+
     protected ?string $table = null;
     protected ?string $primary = null;
-
-    protected array $result = [];
     protected array $data = [];
     protected bool $full = false;
+
+    protected array $result = [];
+    
+    
     protected ?string $clause = null;
 
     protected ?string $order = null;
@@ -23,18 +25,7 @@ trait DataTrait{
     protected array $select = [];
     protected ?string $query = null;
 
-    protected function create(string $table, string $primary)
-    {
-        $this->table = $table;
-        $this->primary = $primary;
-        $describe = $this->describe();
-        
-        $this->check_fail();
-
-        $this->mountData($describe);
-        $this->full = true;
-        return $this;
-    }
+    
 
     public function __set(string $prop,$value)
     {
@@ -45,9 +36,7 @@ trait DataTrait{
             return $this;
         }
 
-        if($this->full && !array_key_exists($prop,$this->data)){
-            throw new Exception("{$prop} field does not exist in the table {$this->table}.");
-        }
+        $this->isSettable($prop);
 
         $this->data[$prop]['changed'] = true;
         $this->data[$prop]['value'] = $value;
@@ -62,10 +51,7 @@ trait DataTrait{
 
     public function __get(string $field)
     {
-        if($this->full && !array_key_exists($field,$this->data)){
-            throw new Exception("{$field} field does not exist in the table {$this->table}.");
-        }
-
+        $this->isSettable($field);
         return $this->data[$field]['value'];
     }
 
@@ -99,13 +85,9 @@ trait DataTrait{
 
     public function orderBy(string $field, string $ord = 'ASC')
     {
-        if(!array_key_exists(str_replace(['asc','ASC','desc','DESC',' '],'',$field),$this->data) && $this->full){
-            throw new Exception("{$field} field does not exist in the table {$this->table}.");
-        }
+        $this->isSettable( str_replace(['asc','ASC','desc','DESC',' '],'',$field) );
 
-        if(strpos(strtolower($field),'asc') || strpos(strtolower($field),'desc')){
-            $ord = '';
-        }
+        $ord = (strpos(strtolower($field),'asc') || strpos(strtolower($field),'desc')) ? '' : $ord;
 
         $this->order = " ORDER BY {$field} {$ord} ";
         return $this;
@@ -118,9 +100,7 @@ trait DataTrait{
 
         foreach ($params as $field) {
 
-            if(!array_key_exists($field,$this->data) && $this->full){
-                throw new Exception("{$field} field does not exist in the table {$this->table}.");
-            }
+            $this->isSettable($field);
 
             $this->select[$field] = true;
         }
@@ -159,9 +139,7 @@ trait DataTrait{
 
     public function offset(int $offset)
     {
-        if(is_null($this->limit)){
-            throw new Exception("The limit must be set before the offset.");
-        }
+        $this->checkLimit();
 
         $this->offset = $offset;
         return $this;
@@ -189,11 +167,10 @@ trait DataTrait{
 
         foreach ($arrayValues as $key => $value) {
 
-            if(!array_key_exists($key,$this->data)){
-                throw new Exception("{$key} field does not exist in the table {$this->table}.");
-            }
+            $this->isSettable($key);
 
             $clone->data[$key]['value'] = $value;
+
         }
         return $clone;
     }
@@ -253,9 +230,7 @@ trait DataTrait{
                 continue;
             }
 
-            if(strlen($value['value']) > $value['maxlength']){
-                throw new Exception("The information provided for column {$key} of table {$this->table} exceeded that allowed.");
-            }
+            $this->checkMaxlength($key, $value['value'], $value['maxlength']);
 
             $columns .= $key.',';
             $values .= ':'.$key.',';
@@ -301,8 +276,7 @@ trait DataTrait{
 
     public function findById($id)
     {
-        $this->where([$this->primary,'=',$id]);
-        return $this;
+        return $this->where([$this->primary,'=',$id]);
     }
 
     public function execute()
@@ -336,9 +310,26 @@ trait DataTrait{
     public function find(?int $key = null)
     {
         $this->query = " SELECT * FROM {$this->table} ";
+        return (is_int($key)) ? $this->findById($key) : $this;
+    }
 
-        if(is_int($key)){
-            return $this->findById($key);
+    public function save()
+    {
+        $this->transaction('begin');
+
+        try{
+            $this->update(
+                $this->mountSave()['data'],
+                "{$this->primary}=:{$this->primary}", 
+                $this->primary.'='.$this->getData()[$this->primary]['value']
+            );
+
+            $this->check_fail();
+
+            $this->transaction('commit');
+        }catch(Exception $er){
+            $this->transaction('rollback');
+            throw $er;
         }
 
         return $this;

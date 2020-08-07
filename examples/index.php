@@ -17,7 +17,7 @@ try{
     $entity->password = '123456';
 
     /* Insert entity in database */
-    $entity->persist();
+    //$entity->persist();
 
     /* Find by primary key */
     $user = $entity->find()->execute()->first()->toEntity();
@@ -26,6 +26,8 @@ try{
     $user = $entity->find()->only(['name','email'])->execute()->first();
     $name = $user->name;
     $email = $user->email;
+
+    
     /* OR */
     $name = $entity->find()->only('name')->execute()->first()->name;
 

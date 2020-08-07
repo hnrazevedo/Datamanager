@@ -2,88 +2,21 @@
 
 namespace HnrAzevedo\Datamanager;
 
-use Exception;
-
 abstract class Datamanager
 {
-    use DataTrait;
+    use DataTrait, SynchronizeTrait;
+
+    protected ?string $table = null;
+    protected ?string $primary = null;
+    protected array $data = [];
+
     
     private array $where = [''=> ["1",'=',"1"] ];
 
-    private function mountTable_Field(string $field, $value = null)
-    {
-        $this->$field = null;
-    }
-
-    private function mountTable_Type(string $field, $value = null)
-    {
-        $type = $value;
-        $maxlength = null;
-
-        if(strpos($value,'(')){
-            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['varchar','char','text'])) ? 'string' : $type;
-            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['tinyint','mediumint','smallint','bigtint','int'])) ? 'int' : $type;
-            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['decimal','float','double','real'])) ? 'float' : $type;
-        }
-
-        $maxlength = (in_array( $type , ['string','float','int'])) ? substr($value,(strpos($value,'(')+1),-1) : $maxlength;
-        $maxlength = (in_array( $type , ['date'])) ? 10 : $maxlength;
-        $maxlength = (in_array( $type , ['datetime'])) ? 19 : $maxlength;
-        $maxlength = (in_array( $type , ['boolean'])) ? 1 : $maxlength;
-
-        $this->$field = ['maxlength' => $maxlength];
-        $this->$field = ['type' => $type];
-    }
-
-    private function mountTable_Null(string $field, $value = null)
-    {
-        $this->$field = ['null' => ($value === 'YES') ? 1 : 0];
-    }
-
-    private function mountTable_Key(string $field, $value = null)
-    {
-        $this->$field = ['key' => $value];
-        $this->$field = ['upgradeable' => ($value == 'PRI') ? 0 : 1];
-    }
-
-    private function mountTable_Extra(string $field, $value = null)
-    {
-        $this->$field = ['extra' => $value];
-    }
-
-    private function mountTable_Default(string $field, $value = null)
-    {
-        $this->$field = ['default' => $value];
-        $this->$field = ['value' => null];
-        $this->$field = ['changed' => false];
-        $this->select[$field] = true;
-    }
-
-    private function mountData(array $table): Datamanager
-    {
-        foreach ($table as $column) {
-            foreach ($column as $propriety => $value) {
-                $method = "mountTable_{$propriety}";
-                $this->$method($column['Field'], $value);
-            }
-        }
-        return $this;
-    }
-
-    public function check_where_array(array $where)
-    {
-        if(count($where) != 3){
-            throw new Exception("Condition where set incorrectly: ".implode(' ',$where));
-        }
-
-        if(!array_key_exists($where[0],$this->data) && $this->full){
-            throw new Exception("{$where[0]} field does not exist in the table {$this->table}.");
-        }
-    }
 
     private function mountRemove(): array
     {
-        $return = ['data' => [], 'where' => ''];
+        $return = ['data' => '', 'where' => ''];
         foreach($this->where as $clause => $condition){
             if(strlen($clause) === 0){
                 $return['where'] .= " {$clause} {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
@@ -116,27 +49,7 @@ abstract class Datamanager
         return $return;
     }
 
-    public function save(): Datamanager
-    {
-        $this->transaction('begin');
-
-        try{
-            $this->update(
-                $this->mountSave()['data'],
-                "{$this->primary}=:{$this->primary}", 
-                $this->primary.'='.$this->getData()[$this->primary]['value']
-            );
-
-            $this->check_fail();
-
-            $this->transaction('commit');
-        }catch(Exception $er){
-            $this->transaction('rollback');
-            throw $er;
-        }
-
-        return $this;
-    }
+    
 
     private function mountWhereExec(): array
     {
