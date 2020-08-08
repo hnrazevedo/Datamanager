@@ -1,12 +1,12 @@
 # Datamanager
 
 [![Maintainer](https://img.shields.io/badge/maintainer-@hnrazevedo-blue?style=flat-square)](https://github.com/hnrazevedo)
-[![Latest Version](https://img.shields.io/github/v/tag/hnrazevedo/datamanager?label=version&style=flat-square)](Release)
-[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/quality/g/hnrazevedo/datamanager?style=flat-square)](https://scrutinizer-ci.com/g/hnrazevedo/datamanager/?branch=master)
-[![Build Status](https://img.shields.io/scrutinizer/build/g/hnrazevedo/datamanager?style=flat-square)](https://scrutinizer-ci.com/g/hnrazevedo/datamanager/build-status/master)
+[![Latest Version](https://img.shields.io/github/v/tag/hnrazevedo/Datamanager?label=version&style=flat-square)](Release)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/quality/g/hnrazevedo/Datamanager?style=flat-square)](https://scrutinizer-ci.com/g/hnrazevedo/Datamanager/?branch=master)
+[![Build Status](https://img.shields.io/scrutinizer/build/g/hnrazevedo/Datamanager?style=flat-square)](https://scrutinizer-ci.com/g/hnrazevedo/Datamanager/build-status/master)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![PHP from Packagist](https://img.shields.io/packagist/php-v/hnrazevedo/datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/datamanager)
-[![Total Downloads](https://img.shields.io/packagist/dt/hnrazevedo/datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/datamanager)
+[![PHP from Packagist](https://img.shields.io/packagist/php-v/hnrazevedo/Datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/Datamanager)
+[![Total Downloads](https://img.shields.io/packagist/dt/hnrazevedo/Datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/Datamanager)
 
 ###### Datamanager is a simple persistence abstraction component in the database. Its author is not a professional in the development area, just someone from the Technology area who is improving his knowledge.
 
@@ -21,7 +21,7 @@ O Datamanager é um simples componente de abstração de persistência no banco 
 
 ## Installation
 
-DataManager is available via Composer:
+Datamanager is available via Composer:
 
 ```bash 
 "hnrazevedo/datamanager": "^1.0"
@@ -30,9 +30,201 @@ DataManager is available via Composer:
 or run
 
 ```bash
-composer require hnrazevedo/datamanager
+composer require hnrazevedo/Datamanager
 ```
 
 ## Documentation
 
-is comming...
+###### For details on how to use the Datamanager, see the sample folder with details in the component directory
+
+Para mais detalhes sobre como usar o Datamanager, veja a pasta de exemplos com detalhes no diretório do componente
+
+#### erros
+
+#### In case of errors, Datamanager will throw a DatamanagerException, so it is necessary to import it into your class
+Em casos de erros, o Datamanager disparara uma DatamanagerException, então é necessário importar a mesma em sua classe.
+
+```php
+    use HnrAzevedo\Datamanager\DatamanagerException;
+```
+
+#### connection
+
+###### To begin using the Datamanager, you need to connect to the database (MariaDB / MySql). For more connections [PDO connections manual on PHP.net](https://www.php.net/manual/pt_BR/pdo.drivers.php)
+
+Para começar a usar o Datamanager precisamos de uma conexão com o seu banco de dados. Para ver as conexões possíveis acesse o [manual de conexões do PDO em PHP.net](https://www.php.net/manual/pt_BR/pdo.drivers.php)
+
+```php
+define("DATAMANAGER_CONFIG", [
+    "driver" => "mysql",
+    "host" => "localhost",
+    "charset" => "utf8",
+    "port" => 3306,
+    "username" => "root",
+    "password" => "",
+    "database" => "",
+    "timezone" => "America/Sao_Paulo",
+    "options" => [
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+        PDO::ATTR_CASE => PDO::CASE_NATURAL,
+        PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING
+    ],
+    "dateformat" => "d/m/Y"
+]);
+```
+
+#### your model
+
+######The Datamanager is based on an MVC structure with the Layer Super Type and Active Record design patterns. Soon to consume it is necessary to create the model of your table and inherit the Data Layer.
+
+O Datamanager é baseado em uma estrutura MVC com os padrões de projeto Layer Super Type e Active Record. Logo para consumir é necessário criar o modelo de sua tabela e herdar o Datamanager.
+
+```php
+namespace Model;
+
+use HnrAzevedo\Datamanager\Datamanager;
+
+class User extends Datamanager
+{
+    public function __construct()
+    {
+        /**
+         * @param string Table name
+         * @param string Primary key column
+         */
+        parent::create('user','id');
+    }
+}
+```
+
+#### find
+
+```php
+    use Model\User;
+    
+    $entity = new User();
+
+    /* Find by primary key */
+    $user = $entity->find(1)->execute()->first()->toEntity();
+
+    /* Search only for columns defined in advance  */
+    $user = $entity->find(1)->only(['name','email'])->execute()->first();
+    $name = $user->name;
+    $email = $user->email;
+    /* OR */
+    $name = $entity->find()->only('name')->execute()->first()->name;
+
+    /* Search except for columns defined in advance  */
+    $user = $entity->find()->except(['name','email'])->execute()->first();
+    /* OR */
+    $user = $entity->find()->except('name')->execute()->first();
+
+    /* Limit example */
+    $users = $entity->find()->limit(5)->execute()->result();
+    /* Offset example */
+    $users = $entity->find()->limit(5)->offset(5)->execute()->result();
+
+    /* OrdeBy example */
+    $users = $entity->find()->orderBy('birth ASC')->execute()->result();
+    /* OR */
+    $users = $entity->find()->orderBy('birth','ASC')->execute()->result();
+
+
+    /* Between example */
+    $user = $entity->find()->between(['AND birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+    /* Condition AND is default */
+    $user = $entity->find()->between(['birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+
+    /* Where example */
+    $user->find()->where([
+        ['name','=','Henri Azevedo'],
+        'OR' => [
+            'email','LIKE','otheremail@gmail.com'
+            ]
+    ])->execute();
+
+    /* Searches through all records and returns a result array */
+    $results = $entity->find()->execute()->result();
+
+    /* Searches for all records and returns an array of Model\User objects */
+    $results = $entity->find()->execute()->toEntity();
+```
+
+#### save
+```php
+    use Model\User;
+
+    $entity = new User();
+
+    $user = $entity->find()->execute()->first();
+
+    /* Change info to update */
+    $user->name = 'Other Name';
+    $user->email = 'otheremail@gmail.com';
+
+    /* Upload by primary key from the uploaded entity */
+    /* If the changed information is a primary key or a foreign key it will be ignored in the update */
+    /* NOTE: Must already have the Model returned from a query */
+    $user->save();
+```
+
+#### remove
+```php
+    use Model\User;
+
+    $entity = new User();
+
+    /* Remove by cause *Where* */
+    $entity->remove()->where([
+        ['name','=','Other Name'],
+        'OR' => ['email','LIKE','otheremail@gmail.com']
+    ])->execute();
+
+    /* Remove by primary key */
+    /* NOTE: Required to have already returned a query */
+    $entity->remove()->execute();
+    /* OR */
+    $entity->remove(true);
+```
+
+#### persist
+```php
+    use Model\User;
+
+    $entity = new User();
+
+    /* Set new info for insert in database */
+    $entity->name = 'Henri Azevedo';
+    $entity->email = 'hnr.azevedo@gmail.com';
+    $entity->password = '123456';
+    $entity->birth = '28/09/1996';
+    $entity->register = date('Y-m-d H:i:s');
+
+    /* Insert entity in database */
+    $entity->persist();
+```
+
+#### count
+```php
+    use Model\User;
+
+    $entity = new User();
+    $registers = $entity->find()->only('id')->execute()->count();
+```
+
+## Support
+
+###### Security: If you discover any security related issues, please email hnrazevedo@gmail.com instead of using the issue tracker.
+
+Se você descobrir algum problema relacionado à segurança, envie um e-mail para hnrazevedo@gmail.com em vez de usar o rastreador de problemas.
+
+## Credits
+
+- [Henri Azevedo](https://github.com/hnrazevedo) (Developer)
+- [Robson V. Leite](https://github.com/robsonvleite) (Readme based on your datalayer design)
+
+## License
+
+The MIT License (MIT). Please see [License File](https://github.com/hnrazevedo/Datamanager/blob/master/LICENSE.md) for more information.
