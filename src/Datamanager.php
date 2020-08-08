@@ -69,7 +69,6 @@ abstract class Datamanager
             if(!array_key_exists($field,$this->data)){
                 throw new DatamanagerException("{$field} field does not exist in the table {$this->table}.");
             }
-
             $this->excepts[$field] = true;
         }
 
@@ -100,9 +99,7 @@ abstract class Datamanager
         $this->select = [];
 
         foreach ($params as $field) {
-
             $this->isSettable($field);
-
             $this->select[$field] = true;
         }
         $this->select[$this->primary] = true;
