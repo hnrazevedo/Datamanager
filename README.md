@@ -45,7 +45,7 @@ Para mais detalhes sobre como usar o Datamanager, veja a pasta de exemplos com d
 Em casos de erros, o Datamanager disparara uma DatamanagerException, então é necessário importar a mesma em sua classe.
 
 ```php
-    use HnrAzevedo\Datamanager\DatamanagerException;
+use HnrAzevedo\Datamanager\DatamanagerException;
 ```
 
 #### connection
@@ -102,116 +102,115 @@ class User extends Datamanager
 #### find
 
 ```php
-    use Model\User;
+use Model\User;
     
-    $entity = new User();
+$entity = new User();
 
-    /* Find by primary key */
-    $user = $entity->find(1)->execute()->first()->toEntity();
+/* Find by primary key */
+$user = $entity->find(1)->execute()->first()->toEntity();
 
-    /* Search only for columns defined in advance  */
-    $user = $entity->find(1)->only(['name','email'])->execute()->first();
-    $name = $user->name;
-    $email = $user->email;
-    /* OR */
-    $name = $entity->find()->only('name')->execute()->first()->name;
+/* Search only for columns defined in advance  */
+$user = $entity->find(1)->only(['name','email'])->execute()->first();
+$name = $user->name;
+$email = $user->email;
+/* OR */
+$name = $entity->find()->only('name')->execute()->first()->name;
 
-    /* Search except for columns defined in advance  */
-    $user = $entity->find()->except(['name','email'])->execute()->first();
-    /* OR */
-    $user = $entity->find()->except('name')->execute()->first();
+/* Search except for columns defined in advance  */
+$user = $entity->find()->except(['name','email'])->execute()->first();
+/* OR */
+$user = $entity->find()->except('name')->execute()->first();
 
-    /* Limit example */
-    $users = $entity->find()->limit(5)->execute()->result();
-    /* Offset example */
-    $users = $entity->find()->limit(5)->offset(5)->execute()->result();
+/* Limit example */
+$users = $entity->find()->limit(5)->execute()->result();
+/* Offset example */
+$users = $entity->find()->limit(5)->offset(5)->execute()->result();
 
-    /* OrdeBy example */
-    $users = $entity->find()->orderBy('birth ASC')->execute()->result();
-    /* OR */
-    $users = $entity->find()->orderBy('birth','ASC')->execute()->result();
+/* OrdeBy example */
+$users = $entity->find()->orderBy('birth ASC')->execute()->result();
+/* OR */
+$users = $entity->find()->orderBy('birth','ASC')->execute()->result();
 
+/* Between example */
+$user = $entity->find()->between(['AND birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+/* Condition AND is default */
+$user = $entity->find()->between(['birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
 
-    /* Between example */
-    $user = $entity->find()->between(['AND birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
-    /* Condition AND is default */
-    $user = $entity->find()->between(['birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+/* Where example */
+$user->find()->where([
+    ['name','=','Henri Azevedo'],
+    'OR' => [
+        'email','LIKE','otheremail@gmail.com'
+        ]
+])->execute();
 
-    /* Where example */
-    $user->find()->where([
-        ['name','=','Henri Azevedo'],
-        'OR' => [
-            'email','LIKE','otheremail@gmail.com'
-            ]
-    ])->execute();
+/* Searches through all records and returns a result array */
+$results = $entity->find()->execute()->result();
 
-    /* Searches through all records and returns a result array */
-    $results = $entity->find()->execute()->result();
-
-    /* Searches for all records and returns an array of Model\User objects */
-    $results = $entity->find()->execute()->toEntity();
+/* Searches for all records and returns an array of Model\User objects */
+$results = $entity->find()->execute()->toEntity();
 ```
 
 #### save
 ```php
-    use Model\User;
+use Model\User;
 
-    $entity = new User();
+$entity = new User();
 
-    $user = $entity->find()->execute()->first();
+$user = $entity->find()->execute()->first();
 
-    /* Change info to update */
-    $user->name = 'Other Name';
-    $user->email = 'otheremail@gmail.com';
+/* Change info to update */
+$user->name = 'Other Name';
+$user->email = 'otheremail@gmail.com';
 
-    /* Upload by primary key from the uploaded entity */
-    /* If the changed information is a primary key or a foreign key it will be ignored in the update */
-    /* NOTE: Must already have the Model returned from a query */
-    $user->save();
+/* Upload by primary key from the uploaded entity */
+/* If the changed information is a primary key or a foreign key it will be ignored in the update */
+/* NOTE: Must already have the Model returned from a query */
+$user->save();
 ```
 
 #### remove
 ```php
-    use Model\User;
+use Model\User;
 
-    $entity = new User();
+$entity = new User();
 
-    /* Remove by cause *Where* */
-    $entity->remove()->where([
-        ['name','=','Other Name'],
-        'OR' => ['email','LIKE','otheremail@gmail.com']
-    ])->execute();
+/* Remove by cause *Where* */
+$entity->remove()->where([
+    ['name','=','Other Name'],
+    'OR' => ['email','LIKE','otheremail@gmail.com']
+])->execute();
 
-    /* Remove by primary key */
-    /* NOTE: Required to have already returned a query */
-    $entity->remove()->execute();
-    /* OR */
-    $entity->remove(true);
+/* Remove by primary key */
+/* NOTE: Required to have already returned a query */
+$entity->remove()->execute();
+/* OR */
+$entity->remove(true);
 ```
 
 #### persist
 ```php
-    use Model\User;
+use Model\User;
 
-    $entity = new User();
+$entity = new User();
 
-    /* Set new info for insert in database */
-    $entity->name = 'Henri Azevedo';
-    $entity->email = 'hnr.azevedo@gmail.com';
-    $entity->password = '123456';
-    $entity->birth = '28/09/1996';
-    $entity->register = date('Y-m-d H:i:s');
+/* Set new info for insert in database */
+$entity->name = 'Henri Azevedo';
+$entity->email = 'hnr.azevedo@gmail.com';
+$entity->password = '123456';
+$entity->birth = '28/09/1996';
+$entity->register = date('Y-m-d H:i:s');
 
-    /* Insert entity in database */
-    $entity->persist();
+/* Insert entity in database */
+$entity->persist();
 ```
 
 #### count
 ```php
-    use Model\User;
+use Model\User;
 
-    $entity = new User();
-    $registers = $entity->find()->only('id')->execute()->count();
+$entity = new User();
+$registers = $entity->find()->only('id')->execute()->count();
 ```
 
 ## Support
