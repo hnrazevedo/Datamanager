@@ -8,6 +8,8 @@ use HnrAzevedo\Datamanager\Datamanager;
   * @property string $name 
   * @property string $email 
   * @property string $password
+  * @property string birth
+  * @property string register
   */ 
 class User extends Datamanager{
 
