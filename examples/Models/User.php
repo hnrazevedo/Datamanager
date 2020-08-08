@@ -15,6 +15,10 @@ class User extends Datamanager{
 
     public function __construct()
     {
+        /**
+         * @param string Table name
+         * @param string Primary key column
+         */
         parent::create('user','id');
     }
 
