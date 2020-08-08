@@ -77,7 +77,7 @@ define("DATAMANAGER_CONFIG", [
 
 #### your model
 
-######The Datamanager is based on an MVC structure with the Layer Super Type and Active Record design patterns. Soon to consume it is necessary to create the model of your table and inherit the Data Layer.
+######The Datamanager is based on an MVC structure with the Layer Super Type and Active Record design patterns. Soon to consume it is necessary to create the model of your table and inherit the Datamanager.
 
 O Datamanager é baseado em uma estrutura MVC com os padrões de projeto Layer Super Type e Active Record. Logo para consumir é necessário criar o modelo de sua tabela e herdar o Datamanager.
 
