@@ -62,7 +62,3 @@ try{
     die("Code Error: {$er->getCode()}, Line: {$er->getLine()}, File: {$er->getFile()}, Message: {$er->getMessage()}.");
 
 }
-
-
-
-
