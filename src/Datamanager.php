@@ -12,6 +12,7 @@ abstract class Datamanager
     protected ?string $primary = null;
     protected array $data = [];
     protected array $where = [''=> ["1",'=',"1"] ];
+    protected array $between = [];
 
     public function __set(string $prop,$value)
     {
@@ -131,6 +132,12 @@ abstract class Datamanager
         return $this;
     }
 
+    public function between(array $bet)
+    {
+        $this->between = array_merge($this->between, $bet);
+        return $this;
+    }
+
     public function limit(string $limit)
     {
         $this->limit = $limit;
@@ -214,6 +221,8 @@ abstract class Datamanager
         $this->mountSelect();
         
         $where = substr($this->mountWhereExec()['where'],0,-1);
+        $where .= substr($this->mountBetweenExec()['where'],0,-1);
+
         $this->query .= " WHERE {$where} ";
 
         $this->query .= $this->order;
@@ -221,7 +230,10 @@ abstract class Datamanager
         $this->mountLimit();
         $this->mountOffset();
 
-        $this->result = $this->select($this->query, $this->mountWhereExec()['data']);
+        $this->result = $this->select(
+            $this->query, 
+            array_merge($this->mountWhereExec()['data'], $this->mountBetweenExec()['data'])
+        );
 
         $this->check_fail();
 

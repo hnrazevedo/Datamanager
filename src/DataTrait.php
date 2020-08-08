@@ -77,6 +77,22 @@ trait DataTrait{
         return $return;
     }
 
+    protected function mountBetweenExec(): array
+    {
+        $return = ['where' => '', 'data' => []];
+
+        foreach($this->between as $field => $value){
+            $condition = (count(explode(' ',$field)) > 2) ? ' '.explode(' ',$field)[0].' ' : ' AND ';
+            $field = str_replace(['AND','OR',' '],'',$field);
+            $return['where'] .= " {$condition} {$field} BETWEEN :q_1{$field} AND :q_2{$field} ";
+            $return['data'] = [
+                "q_1{$field}" => (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value[0]) , 'Y-m-d')),
+                "q_2{$field}" => (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value[1]) , 'Y-m-d'))
+            ];
+        }
+        return $return;
+    }
+
     protected function mountSelect()
     {
         $select = implode(',',array_keys($this->select));

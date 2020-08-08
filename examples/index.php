@@ -22,8 +22,6 @@ try{
     /* Insert entity in database */
     $entity->persist();
 
-    die();
-
     /* Find by primary key */
     $user = $entity->find()->execute()->first()->toEntity();
 
@@ -34,6 +32,8 @@ try{
 
     /* OR */
     $name = $entity->find()->only('name')->execute()->first()->name;
+
+    $user = $entity->find()->between(['AND birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
 
     /* Change info to update */
     $user->name = 'Other Name';
