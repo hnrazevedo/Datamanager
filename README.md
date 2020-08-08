@@ -1,4 +1,4 @@
-# Datamanager
+# Datamanager @HnrAzevedo
 
 [![Maintainer](https://img.shields.io/badge/maintainer-@hnrazevedo-blue?style=flat-square)](https://github.com/hnrazevedo)
 [![Latest Version](https://img.shields.io/github/v/tag/hnrazevedo/Datamanager?label=version&style=flat-square)](Release)
