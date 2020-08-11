@@ -1,6 +1,6 @@
 {
     "name": "hnrazevedo/datamanager",
-    "description": "Tools for developing personal projects",
+    "description": "Datamanager is a simple persistence abstraction component in the database.",
     "authors": [
         {
             "name": "Henri Mateus Santos de Azevedo",

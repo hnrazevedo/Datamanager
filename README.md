@@ -36,10 +36,9 @@ composer require hnrazevedo/Datamanager
 ## Documentation
 
 ###### For details on how to use the Datamanager, see the sample folder with details in the component directory
-
 Para mais detalhes sobre como usar o Datamanager, veja a pasta de exemplos com detalhes no diretório do componente
 
-#### erros
+### Errors
 
 #### In case of errors, Datamanager will throw a DatamanagerException, so it is necessary to import it into your class
 Em casos de erros, o Datamanager disparara uma DatamanagerException, então é necessário importar a mesma em sua classe.
@@ -48,10 +47,9 @@ Em casos de erros, o Datamanager disparara uma DatamanagerException, então é n
 use HnrAzevedo\Datamanager\DatamanagerException;
 ```
 
-#### connection
+### Connection
 
-###### To begin using the Datamanager, you need to connect to the database (MariaDB / MySql). For more connections [PDO connections manual on PHP.net](https://www.php.net/manual/pt_BR/pdo.drivers.php)
-
+##### To begin using the Datamanager, you need to connect to the database (MariaDB / MySql). For more connections [PDO connections manual on PHP.net](https://www.php.net/manual/pt_BR/pdo.drivers.php)
 Para começar a usar o Datamanager precisamos de uma conexão com o seu banco de dados. Para ver as conexões possíveis acesse o [manual de conexões do PDO em PHP.net](https://www.php.net/manual/pt_BR/pdo.drivers.php)
 
 ```php
@@ -75,11 +73,10 @@ define("DATAMANAGER_CONFIG", [
 ]);
 ```
 
-#### your model
+### Your model
 
-######The Datamanager is based on an MVC structure with the Layer Super Type and Active Record design patterns. Soon to consume it is necessary to create the model of your table and inherit the Datamanager.
-
-O Datamanager é baseado em uma estrutura MVC com os padrões de projeto Layer Super Type e Active Record. Logo para consumir é necessário criar o modelo de sua tabela e herdar o Datamanager.
+#### The Datamanager is based on an MVC structure. Soon to consume it is necessary to create the model of your table and inherit the Datamanager.
+O Datamanager é baseado em uma estrutura MVC. Logo para consumir é necessário criar o modelo de sua tabela e herdar o Datamanager.
 
 ```php
 namespace Model;
@@ -99,8 +96,9 @@ class User extends Datamanager
 }
 ```
 
-#### find
+## Methods
 
+### Find
 ```php
 use Model\User;
     
@@ -151,7 +149,7 @@ $results = $entity->find()->execute()->result();
 $results = $entity->find()->execute()->toEntity();
 ```
 
-#### save
+### Save
 ```php
 use Model\User;
 
@@ -169,7 +167,7 @@ $user->email = 'otheremail@gmail.com';
 $user->save();
 ```
 
-#### remove
+### Remove
 ```php
 use Model\User;
 
@@ -188,7 +186,7 @@ $entity->remove()->execute();
 $entity->remove(true);
 ```
 
-#### persist
+### Persist
 ```php
 use Model\User;
 
@@ -205,7 +203,7 @@ $entity->register = date('Y-m-d H:i:s');
 $entity->persist();
 ```
 
-#### count
+### Count
 ```php
 use Model\User;
 
