@@ -12,6 +12,7 @@
         "php": ">=7.4",
         "ext-pdo": "*"
     },
+    "minimum-stability":"dev",
     "license":"MIT",
     "autoload": {
         "psr-4": {
