@@ -75,15 +75,15 @@ define("DATAMANAGER_CONFIG", [
 
 ### Your model
 
-#### The Datamanager is based on an MVC structure. Soon to consume it is necessary to create the model of your table and inherit the Datamanager.
-O Datamanager é baseado em uma estrutura MVC. Logo para consumir é necessário criar o modelo de sua tabela e herdar o Datamanager.
+#### The Datamanager is based on an MVC structure. Soon to consume it is necessary to create the model of your table and inherit the Datamanager\Model.
+O Datamanager é baseado em uma estrutura MVC. Logo para consumir é necessário criar o modelo de sua tabela e herdar o Datamanager\Model.
 
 ```php
 namespace Model;
 
-use HnrAzevedo\Datamanager\Datamanager;
+use HnrAzevedo\Datamanager\Model;
 
-class User extends Datamanager
+class User extends Model
 {
     public function __construct()
     {
