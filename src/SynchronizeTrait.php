@@ -8,16 +8,17 @@ trait SynchronizeTrait{
     protected ?string $table = null;
     protected ?string $primary = null;
     protected bool $full = false;
+    protected static ?array $describe = null;
 
-    protected function create(string $table, string $primary)
+    protected function synchronize(string $table, string $primary)
     {
         $this->table = $table;
         $this->primary = $primary;
-        $describe = $this->describe();
+        self::$describe ??= $this->describe();
         
         $this->check_fail();
 
-        $this->mountData($describe);
+        $this->mountData(self::$describe);
         $this->full = true;
         return $this;
     }

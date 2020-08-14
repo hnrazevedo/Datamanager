@@ -4,7 +4,7 @@ namespace HnrAzevedo\Datamanager;
 
 use HnrAzevedo\Datamanager\DatamanagerException;
 
-abstract class Datamanager
+class Datamanager
 {
     use DataTrait, SynchronizeTrait, EntityTrait, MagicsTrait;
 
