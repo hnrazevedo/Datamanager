@@ -65,8 +65,10 @@ class Datamanager
             $this->isSettable($field);
             $this->select[$field] = true;
         }
-        $this->select[$this->primary] = true;
 
+        if(!is_null($this->primary)){
+            $this->select[$this->primary] = true;
+        }
         return $this;
     }
 
