@@ -14,11 +14,11 @@ trait SynchronizeTrait{
     {
         $this->table = $table;
         $this->primary = $primary;
-        self::$describe ??= $this->describe();
+        self::$describe[$table] ??= $this->describe();
         
         $this->check_fail();
 
-        $this->mountData(self::$describe);
+        $this->mountData(self::$describe[$table]);
         $this->full = true;
         return $this;
     }
