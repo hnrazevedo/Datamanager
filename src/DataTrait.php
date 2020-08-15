@@ -55,18 +55,28 @@ trait DataTrait{
     protected function mountWhereExec(): array
     {
         $return = ['where' => '', 'data' => []];
-
         foreach ($this->where as $key => $value) {
 
             $key = (!$key) ? '' : " {$key} ";
 
             if(is_array($value[0])){
 
-                foreach ($value as $k => $v) {
-                    $return['where'] .= " {$key} {$v[0]} {$v[1]} :q_{$v[0]} ";
-                    $return['data']["q_{$v[0]}"] = $v[2];
+                if(is_array($value[0][2])){
+                    $where = '';
+
+                    foreach($value[0][2] as $v => $valu){
+                        $where .= " :q_{$value[0][0]}_{$v},";
+                        $return['data']["q_{$value[0][0]}_{$v}"] = $valu;
+                    }
+
+                    $where = substr($where,0,-1);
+                    $return['where'] .= " {$key} {$value[0][0]} {$value[0][1]} ($where) ";
+                    
+                    continue;
                 }
 
+                $return['where'] .= " {$key} {$value[0][0]} {$value[0][1]} :q_{$value[0][0]} ";
+                $return['data']["q_{$value[0][0]}"] = $value[0][2];
                 continue;
             }
              
