@@ -59,30 +59,29 @@ trait DataTrait{
 
             $key = (!$key) ? '' : " {$key} ";
 
-            if(is_array($value[0])){
-
-                if(is_array($value[0][2])){
-                    $where = '';
-
-                    foreach($value[0][2] as $v => $valu){
-                        $where .= " :q_{$value[0][0]}_{$v},";
-                        $return['data']["q_{$value[0][0]}_{$v}"] = $valu;
-                    }
-
-                    $where = substr($where,0,-1);
-                    $return['where'] .= " {$key} {$value[0][0]} {$value[0][1]} ($where) ";
-                    
+            if(!is_array($value[0])){
+                $return['where'] .= " {$key} {$value[0]} {$value[1]} :q_{$value[0]} ";
+                $return['data']["q_{$value[0]}"] = $value[2];
+                continue;
+            }
+            
+            for($i = 0; $i < count($value); $i++){
+                
+                if(!is_array($value[$i][2])){
+                    $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} :q_{$value[$i][0]} ";
+                    $return['data']["q_{$value[$i][0]}"] = $value[$i][2];
                     continue;
                 }
 
-                $return['where'] .= " {$key} {$value[0][0]} {$value[0][1]} :q_{$value[0][0]} ";
-                $return['data']["q_{$value[0][0]}"] = $value[0][2];
-                continue;
-            }
-             
-            $return['where'] .= " {$key} {$value[0]} {$value[1]} :q_{$value[0]} ";
-            $return['data']["q_{$value[0]}"] = $value[2];
+                $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} (";
 
+                foreach($value[$i][2] as $v => $valu){
+                    $return['where'] .= " :q_{$value[$i][0]}_{$v},";
+                    $return['data']["q_{$value[$i][0]}_{$v}"] = $valu;
+                }
+
+                $return['where'] = substr($return['where'],0,-1) .') ';
+            }
         }
         return $return;
     }
