@@ -10,7 +10,7 @@ trait SynchronizeTrait{
     protected bool $full = false;
     protected static ?array $describe = null;
 
-    protected function synchronize(string $table, string $primary)
+    protected function synchronize(string $table, ?string $primary = null)
     {
         $this->table = $table;
         $this->primary = $primary;
