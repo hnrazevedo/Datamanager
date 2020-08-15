@@ -24,16 +24,18 @@ trait DataTrait{
     protected function mountRemove(): array
     {
         $return = ['data' => '', 'where' => ''];
+        $c = -1;
         foreach($this->where as $clause => $condition){
+            $c++;
             if(strlen($clause) === 0){
-                $return['where'] .= " {$clause} {$condition[0]} {$condition[1]} :q_{$condition[0]} ";
-                $return['data'] .= "q_{$condition[0]}={$condition[2]}&";
+                $return['where'] .= " {$clause} {$condition[0]} {$condition[1]} :q_{$condition[0]}{$c} ";
+                $return['data'] .= "q_{$condition[0]}={$condition[2]}{$c}&";
                 continue;
             }
                 
             foreach($condition as $value){
-                $return['where'] .= " {$clause} {$value[0]} {$value[1]} :q_{$value[0]} ";
-                $return['data'] .= "q_{$value[0]}={$value[2]}&";
+                $return['where'] .= " {$clause} {$value[0]} {$value[1]} :q_{$value[0]}{$c} ";
+                $return['data'] .= "q_{$value[0]}={$value[2]}{$c}&";
             }
         }
         return $return;
@@ -55,29 +57,31 @@ trait DataTrait{
     protected function mountWhereExec(): array
     {
         $return = ['where' => '', 'data' => []];
+        $c = -1;
         foreach ($this->where as $key => $value) {
-
+            $c++;
             $key = (!$key) ? '' : " {$key} ";
 
             if(!is_array($value[0])){
-                $return['where'] .= " {$key} {$value[0]} {$value[1]} :q_{$value[0]} ";
-                $return['data']["q_{$value[0]}"] = $value[2];
+                $return['where'] .= " {$key} {$value[0]} {$value[1]} :q_{$value[0]}{$c} ";
+                $return['data']["q_{$value[0]}{$c}"] = $value[2];
                 continue;
             }
-            
+
+
             for($i = 0; $i < count($value); $i++){
                 
                 if(!is_array($value[$i][2])){
-                    $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} :q_{$value[$i][0]} ";
-                    $return['data']["q_{$value[$i][0]}"] = $value[$i][2];
+                    $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} :q_{$value[$i][0]}{$c}{$i} ";
+                    $return['data']["q_{$value[$i][0]}{$c}{$i}"] = $value[$i][2];
                     continue;
                 }
 
                 $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} (";
 
                 foreach($value[$i][2] as $v => $valu){
-                    $return['where'] .= " :q_{$value[$i][0]}_{$v},";
-                    $return['data']["q_{$value[$i][0]}_{$v}"] = $valu;
+                    $return['where'] .= " :q_{$value[$i][0]}{$c}{$i}_{$v},";
+                    $return['data']["q_{$value[$i][0]}{$c}{$i}_{$v}"] = $valu;
                 }
 
                 $return['where'] = substr($return['where'],0,-1) .') ';
@@ -90,13 +94,15 @@ trait DataTrait{
     {
         $return = ['where' => '', 'data' => []];
 
+        $c = -1;
         foreach($this->between as $field => $value){
+            $c++;
             $condition = (count(explode(' ',$field)) > 2) ? ' '.explode(' ',$field)[0].' ' : ' AND ';
             $field = str_replace(['AND','OR',' '],'',$field);
-            $return['where'] .= " {$condition} {$field} BETWEEN :q_1{$field} AND :q_2{$field} ";
+            $return['where'] .= " {$condition} {$field} BETWEEN :q_1{$field}{$c} AND :q_2{$field}{$c} ";
             $return['data'] = [
-                "q_1{$field}" => (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value[0]) , 'Y-m-d')),
-                "q_2{$field}" => (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value[1]) , 'Y-m-d'))
+                "q_1{$field}{$c}" => (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value[0]) , 'Y-m-d')),
+                "q_2{$field}{$c}" => (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value[1]) , 'Y-m-d'))
             ];
         }
         return $return;
