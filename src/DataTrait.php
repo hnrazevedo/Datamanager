@@ -54,6 +54,29 @@ trait DataTrait{
         return $return;
     }
 
+    private function mountWheres(array $value): array
+    {
+        $return = [];
+        for($i = 0; $i < count($value); $i++){
+                
+            if(!is_array($value[$i][2])){
+                $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} :q_{$value[$i][0]}{$c}{$i} ";
+                $return['data']["q_{$value[$i][0]}{$c}{$i}"] = $value[$i][2];
+                continue;
+            }
+
+            $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} (";
+
+            foreach($value[$i][2] as $v => $valu){
+                $return['where'] .= " :q_{$value[$i][0]}{$c}{$i}_{$v},";
+                $return['data']["q_{$value[$i][0]}{$c}{$i}_{$v}"] = $valu;
+            }
+
+            $return['where'] = substr($return['where'],0,-1) .') ';
+        }
+        return $return;
+    }
+
     protected function mountWhereExec(): array
     {
         $return = ['where' => '', 'data' => []];
@@ -68,24 +91,8 @@ trait DataTrait{
                 continue;
             }
 
-
-            for($i = 0; $i < count($value); $i++){
-                
-                if(!is_array($value[$i][2])){
-                    $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} :q_{$value[$i][0]}{$c}{$i} ";
-                    $return['data']["q_{$value[$i][0]}{$c}{$i}"] = $value[$i][2];
-                    continue;
-                }
-
-                $return['where'] .= " {$key} {$value[$i][0]} {$value[$i][1]} (";
-
-                foreach($value[$i][2] as $v => $valu){
-                    $return['where'] .= " :q_{$value[$i][0]}{$c}{$i}_{$v},";
-                    $return['data']["q_{$value[$i][0]}{$c}{$i}_{$v}"] = $valu;
-                }
-
-                $return['where'] = substr($return['where'],0,-1) .') ';
-            }
+            $return = array_merge($return,$this->mountWheres($value));
+            
         }
         return $return;
     }
