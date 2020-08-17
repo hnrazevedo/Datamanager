@@ -26,7 +26,7 @@ class Connect
                     DATAMANAGER_CONFIG['options']
                 );
             } catch (Exception $exception) {
-                throw new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
+                throw new DatamanagerException(str_replace(['SQLSTATE[HY000]',"[{$exception->getCode()}]"], '', $exception->getMessage()), $exception->getCode(), $exception);
             }
         }
         return self::$instance;
