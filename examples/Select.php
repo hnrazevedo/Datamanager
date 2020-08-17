@@ -39,9 +39,29 @@ try{
 
 
     /* Between example */
-    $user = $entity->find()->between(['AND birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+    $user = $entity->find()->between([
+        'AND birth'=> [
+            '01/01/1996',
+            '31/12/1996'
+            ]
+        ])->execute()->first();
+
     /* Condition AND is default */
-    $user = $entity->find()->between(['birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+    $user = $entity->find()->between([
+        'birth'=> [
+            '01/01/1996',
+            '31/12/1996'
+            ]
+        ])->execute()->first();
+
+    /* Clause IN */
+    $user = $entity->find()->where([
+        'birth'=> [
+            '01/01/1996',
+            '31/12/1996'
+            ]
+        ])->execute()->first();
+
 
     /* Where example */
     $user->find()->where([

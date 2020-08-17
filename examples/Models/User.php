@@ -2,7 +2,7 @@
 
 namespace Model;
 
-use HnrAzevedo\Datamanager\Datamanager;
+use HnrAzevedo\Datamanager\Model;
 
 /** 
   * @property string $name 
@@ -11,7 +11,7 @@ use HnrAzevedo\Datamanager\Datamanager;
   * @property string birth
   * @property string register
   */ 
-class User extends Datamanager{
+class User extends Model{
 
     public function __construct()
     {
