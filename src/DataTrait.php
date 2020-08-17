@@ -91,7 +91,9 @@ trait DataTrait{
                 continue;
             }
 
-            $return = array_merge($return,$this->mountWheres($value, $key, $c));
+            $altReturn = $this->mountWheres($value, $key, $c);
+            $return['where'] .= $altReturn['where'];
+            $return['data'] = array_merge($return['data'],$altReturn['data']);
             
         }
         return $return;
