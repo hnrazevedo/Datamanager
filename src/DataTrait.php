@@ -54,7 +54,7 @@ trait DataTrait{
         return $return;
     }
 
-    private function mountWheres(array $value): array
+    private function mountWheres(array $value, string $key): array
     {
         $return = [];
         for($i = 0; $i < count($value); $i++){
@@ -91,7 +91,7 @@ trait DataTrait{
                 continue;
             }
 
-            $return = array_merge($return,$this->mountWheres($value));
+            $return = array_merge($return,$this->mountWheres($value, $key));
             
         }
         return $return;
