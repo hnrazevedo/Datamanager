@@ -56,7 +56,7 @@ trait DataTrait{
 
     private function mountWheres(array $value, string $key, int $c): array
     {
-        $return = [];
+        $return = ['where' => '', 'data' => []];
         for($i = 0; $i < count($value); $i++){
                 
             if(!is_array($value[$i][2])){
