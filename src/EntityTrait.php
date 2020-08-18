@@ -48,7 +48,9 @@ trait EntityTrait{
 
             $this->check_fail();
 
-            $this->getData()[$this->primary]['value'] = $id;
+            $primary = $this->primary;
+            
+            $this->$primary = $id;
             
             $this->transaction('commit');
 
