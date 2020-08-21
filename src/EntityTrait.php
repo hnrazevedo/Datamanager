@@ -62,9 +62,9 @@ trait EntityTrait{
         return $this;
     }
 
-    public function remove(?bool $exec = false)
+    public function remove(bool $exec = false)
     {
-        if($exec !== null){
+        if(!$exec){
             $this->clause = 'remove';    
             return $this;
         }
