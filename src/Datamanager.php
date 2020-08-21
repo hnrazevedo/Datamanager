@@ -201,6 +201,7 @@ class Datamanager
 
         $this->count = count($this->result);
         $this->query = null;
+        $this->where = [''=> ["1",'=',"1"] ];
 
         return $this;
     }
