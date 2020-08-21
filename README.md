@@ -130,9 +130,29 @@ $users = $entity->find()->orderBy('birth ASC')->execute()->result();
 $users = $entity->find()->orderBy('birth','ASC')->execute()->result();
 
 /* Between example */
-$user = $entity->find()->between(['AND birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+$user = $entity->find()->between([
+    'AND birth'=> [
+        '01/01/1996',
+        '31/12/1996'
+        ]
+    ])->execute()->first();
+
 /* Condition AND is default */
-$user = $entity->find()->between(['birth'=> ['01/01/1996','31/12/1996']])->execute()->first();
+$user = $entity->find()->between([
+    'birth'=> [
+        '01/01/1996',
+        '31/12/1996'
+        ]
+    ])->execute()->first();
+
+/* Clause IN */
+$user = $entity->find()->where([
+    'birth'=> [
+        '01/01/1996',
+        '31/12/1996'
+        ]
+    ])->execute()->first();
+
 
 /* Where example */
 $user->find()->where([
@@ -151,8 +171,6 @@ $results = $entity->find()->execute()->toEntity();
 
 ### Save
 ```php
-use Model\User;
-
 $entity = new User();
 
 $user = $entity->find()->execute()->first();
@@ -195,7 +213,7 @@ $entity = new User();
 /* Set new info for insert in database */
 $entity->name = 'Henri Azevedo';
 $entity->email = 'hnr.azevedo@gmail.com';
-$entity->password = '123456';
+$entity->password = password_hash('123456' ,PASSWORD_DEFAULT);
 $entity->birth = '28/09/1996';
 $entity->register = date('Y-m-d H:i:s');
 

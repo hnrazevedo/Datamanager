@@ -17,7 +17,7 @@ try{
     /* Set new info for insert in database */
     $entity->name = 'Henri Azevedo';
     $entity->email = 'hnr.azevedo@gmail.com';
-    $entity->password = '123456';
+    $entity->password = password_hash('123456' ,PASSWORD_DEFAULT);
     $entity->birth = '28/09/1996';
     $entity->register = date('Y-m-d H:i:s');
 
