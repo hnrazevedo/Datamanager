@@ -45,6 +45,20 @@ trait CheckTrait{
 
     protected function isIncremented(string $field): bool
     {
-        return ( strstr($this->data[$field]['extra'],'auto_increment') && $field !== $this->primary );
+        return ( strstr($this->data[$field]['extra'],'auto_increment') && $field === $this->primary );
+    }
+
+    protected function checkForChanges(): bool
+    {
+        $hasChanges = false;
+        foreach($this->data as $data){
+            if($data['changed']){
+                $hasChanges = true;
+            }
+        }
+        if(!$hasChanges){
+            throw new DatamanagerException('There were no changes to be saved in the database.');
+        }
+        return true;
     }
 }

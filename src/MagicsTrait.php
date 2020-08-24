@@ -22,7 +22,7 @@ trait MagicsTrait{
 
         $this->isSettable($prop);
 
-        $this->data[$prop]['changed'] = true;
+        $this->data[$prop]['changed'] = ($prop === $this->primary) ? false : true;
         $this->data[$prop]['value'] = $value;
         
         return $this;

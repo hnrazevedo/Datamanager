@@ -184,6 +184,8 @@ $user->email = 'otheremail@gmail.com';
 /* NOTE: Must already have the Model returned from a query */
 $user->save();
 ```
+#### If there are no state changes to be saved, a DatamanagerException will be thrown.
+Caso não haja mudanças de estado para serem salvas, será lançada uma DatamanagerException.
 
 ### Remove
 ```php

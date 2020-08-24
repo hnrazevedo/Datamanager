@@ -88,6 +88,8 @@ trait EntityTrait{
         $this->transaction('begin');
 
         try{
+            $this->checkForChanges();
+            
             $this->update(
                 $this->mountSave()['data'],
                 "{$this->primary}=:{$this->primary}", 
