@@ -5,6 +5,8 @@ namespace HnrAzevedo\Datamanager;
 use HnrAzevedo\Datamanager\DatamanagerException;
 
 trait EntityTrait{
+    use CheckTrait;
+    
     public function toEntity()
     {
         if($this->getCount() === 0){
@@ -43,6 +45,8 @@ trait EntityTrait{
 
         $this->transaction('begin');
         try{
+
+            $this->checkUniques($data);
            
             $id = $this->insert($data);
 

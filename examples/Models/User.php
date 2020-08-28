@@ -15,6 +15,10 @@ class User extends Model{
 
     public function __construct()
     {
+        $this->fields = [
+            'email'=>'Email',
+            'username'=>'Nome de usuário'
+        ];
         /**
          * @param string Table name
          * @param string Primary key column

@@ -88,6 +88,13 @@ class User extends Model
 {
     public function __construct()
     {
+        /* To return something in place in the database table field in case of errors. */
+        /* NOTE: its definition is optional. */
+        $this->fields = [
+            'email'=>'Email',
+            'username'=>'Nome de usuário'
+        ];
+
         /**
          * @param string Table name
          * @param string Primary key column
@@ -132,35 +139,24 @@ $users = $entity->find()->orderBy('birth','ASC')->execute()->result();
 
 /* Between example */
 $user = $entity->find()->between([
-    'AND birth'=> [
-        '01/01/1996',
-        '31/12/1996'
-        ]
+    'AND birth'=> ['01/01/1996','31/12/1996']
     ])->execute()->first();
 
 /* Condition AND is default */
 $user = $entity->find()->between([
-    'birth'=> [
-        '01/01/1996',
-        '31/12/1996'
-        ]
+    'birth'=> ['01/01/1996','31/12/1996']
     ])->execute()->first();
 
 /* Clause IN */
 $user = $entity->find()->where([
-    'birth'=> [
-        '01/01/1996',
-        '31/12/1996'
-        ]
+    'birth'=> ['01/01/1996','31/12/1996']
     ])->execute()->first();
 
 
 /* Where example */
 $user->find()->where([
     ['name','=','Henri Azevedo'],
-    'OR' => [
-        'email','LIKE','otheremail@gmail.com'
-        ]
+    'OR' => ['email','LIKE','otheremail@gmail.com']
 ])->execute();
 
 /* Searches through all records and returns a result array */

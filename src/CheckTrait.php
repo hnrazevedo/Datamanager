@@ -61,4 +61,16 @@ trait CheckTrait{
         }
         return true;
     }
+
+    protected function checkUniques($data)
+    {
+        foreach($this->data as $d => $dd){
+            if($dd['key'] === 'UNI'){
+                $exist = $this->find()->where([$d,'=',$data[$d]])->only('id')->execute()->getCount();
+                if($exist > 0){
+                    throw new DatamanagerException("A record with the same {$this->getField($d)} already exists.");
+                }
+            }
+        }
+    }
 }
