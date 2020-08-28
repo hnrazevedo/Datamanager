@@ -2,7 +2,7 @@
 
 namespace Model;
 
-use HnrAzevedo\Datamanager\Model;
+use HnrAzevedo\Datamanager\Model as Entity;
 
 /** 
   * @property string $name 
@@ -11,7 +11,7 @@ use HnrAzevedo\Datamanager\Model;
   * @property string birth
   * @property string register
   */ 
-class User extends Model{
+class User extends Entity{
 
     public function __construct()
     {

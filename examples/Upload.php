@@ -1,7 +1,7 @@
 <?php
 
 require __DIR__.'/../vendor/autoload.php';
-require __DIR__.'/Config.php';
+require __DIR__.'/config.php';
 require __DIR__.'/Models/User.php';
 
 /* NOTE: in case of error an exception is thrown */
