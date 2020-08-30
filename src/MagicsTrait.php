@@ -17,6 +17,9 @@ trait MagicsTrait{
                 case 'date':
                     $value = (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value) , 'Y-m-d'));
                     break;
+                case 'datetime':
+                    $value = (date_format( date_create_from_format(DATAMANAGER_CONFIG['datetimeformat'],$value) , 'Y-m-d H:i:s'));
+                    break;
             }
         }
 
@@ -25,7 +28,13 @@ trait MagicsTrait{
         $this->data[$prop]['changed'] = ($prop === $this->primary) ? false : true;
         $this->data[$prop]['value'] = $value;
         
+        $this->$prop = $value;
+        
         return $this;
+    }
+
+    public function get(string $field){
+        return $this->data[$field]['value'];
     }
 
     public function __get(string $field)
