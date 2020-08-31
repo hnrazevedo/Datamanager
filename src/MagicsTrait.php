@@ -28,6 +28,15 @@ trait MagicsTrait{
         return $this;
     }
 
+    public function getVars(): array
+    {
+        $vars = [];
+        foreach($this->data as $var => $value){
+            $vars[$var] = null;
+        }
+        return $vars;
+    }
+
     public function __get(string $field)
     {
         $this->isSettable($field);
