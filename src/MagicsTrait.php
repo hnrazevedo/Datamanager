@@ -28,10 +28,6 @@ trait MagicsTrait{
         return $this;
     }
 
-    public function get(string $field){
-        return $this->data[$field]['value'];
-    }
-
     public function __get(string $field)
     {
         $this->isSettable($field);
