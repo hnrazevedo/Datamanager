@@ -45,7 +45,7 @@ trait SynchronizeTrait{
 
         if(strpos($value,'(')){
             $type = (in_array( substr($value, 0, strpos($value,'(')) , ['varchar','char','text'])) ? 'string' : $type;
-            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['tinyint','mediumint','smallint','bigtint','int'])) ? 'int' : $type;
+            $type = (in_array( substr($value, 0, strpos($value,'(')) , ['tinyint','mediumint','smallint','bigint','int'])) ? 'int' : $type;
             $type = (in_array( substr($value, 0, strpos($value,'(')) , ['decimal','float','double','real'])) ? 'float' : $type;
         }
 
