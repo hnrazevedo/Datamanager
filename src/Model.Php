@@ -2,6 +2,8 @@
 
 namespace HnrAzevedo\Datamanager;
 
+use HnrAzevedo\Datamanager\Datamanager;
+
 class Model extends Datamanager
 {
     protected array $fields = [];
