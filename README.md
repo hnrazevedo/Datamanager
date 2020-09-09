@@ -234,9 +234,26 @@ $entity = new User();
 
 $user = $entity->find()->execute();
 
-/* Return last query execute */
 var_dump($user->debug());           // Return string replacing clause values
+/*
+ * Result:
+ * string(110) " SELECT id,name,username,email,password,code,birth,register,lastaccess,status,type FROM user  WHERE   1 = '1' "
+*/
+
 var_dump($user->debug(true));       // Return array with executed string and field values ​​in separate index
+/*
+ * Result:
+ * array(2) {
+ * ["query"]=>
+ *   string(112) " SELECT id,name,username,email,password,code,birth,register,lastaccess,status,type FROM user  WHERE   1 = :q_10 "
+ * ["data"]=>
+ *   array(1) {
+ *     ["q_10"]=>
+ *     string(1) "1"
+ *   }
+ * }
+ * 
+*/
 
 ```
 
