@@ -24,7 +24,7 @@ O Datamanager é um simples componente de abstração de persistência no banco 
 Datamanager is available via Composer:
 
 ```bash 
-"hnrazevedo/datamanager": "^1.0"
+"hnrazevedo/datamanager": "^1.1"
 ```
 
 or run
@@ -226,6 +226,18 @@ use Model\User;
 
 $entity = new User();
 $registers = $entity->find()->only('id')->execute()->count();
+```
+
+### debug
+```php
+$entity = new User();
+
+$user = $entity->find()->execute();
+
+/* Return last query execute */
+var_dump($user->debug());           // Return string replacing clause values
+var_dump($user->debug(true));       // Return array with executed string and field values ​​in separate index
+
 ```
 
 ## Support
