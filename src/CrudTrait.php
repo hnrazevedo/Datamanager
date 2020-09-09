@@ -9,6 +9,8 @@ use PDO;
 trait CrudTrait{
 
     protected ?DatamanagerException $fail = null;
+    protected string $lastQuery = '';
+    protected array $lastData = [];
 
     protected function check_fail()
     {
@@ -38,6 +40,10 @@ trait CrudTrait{
     {
         try{
             $stmt = Connect::getInstance()->prepare("{$query}");
+
+            $this->lastQuery = "{$query}";
+            $this->lastData = $data;
+
             $stmt->execute($data);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }catch(Exception $exception){
@@ -50,6 +56,10 @@ trait CrudTrait{
     {
         try{
             $stmt = Connect::getInstance()->prepare("DESCRIBE {$this->table}");
+
+            $this->lastQuery = "DESCRIBE {$this->table}";
+            $this->lastData = [];
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }catch(Exception $exception){
@@ -66,13 +76,15 @@ trait CrudTrait{
 
             $stmt = Connect::getInstance()->prepare("INSERT INTO {$this->table} ({$columns}) VALUES ({$values})");
 
-            $stmt->execute($this->filter($data));
+            $dataInsert = $this->filter($data);
+
+            $this->lastQuery = "INSERT INTO {$this->table} ({$columns}) VALUES ({$values})";
+            $this->lastData = $dataInsert;
+
+            $stmt->execute($dataInsert);
 
             return Connect::getInstance()->lastInsertId();
         } catch (Exception $exception) {
-
-
-
             $this->fail = new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
             return null;
         }
@@ -89,8 +101,15 @@ trait CrudTrait{
 
             parse_str($params, $arr);
 
+            $dataUpdate = $this->filter(array_merge($data, $arr));
+
             $stmt = Connect::getInstance()->prepare("UPDATE {$this->table} SET {$dateSet} WHERE {$terms}");
-            $stmt->execute($this->filter(array_merge($data, $arr)));
+
+            $this->lastQuery = "UPDATE {$this->table} SET {$dateSet} WHERE {$terms}";
+            $this->lastData = $dataUpdate;
+
+            $stmt->execute($dataUpdate);
+
             return ($stmt->rowCount() ?? 1);
         } catch (Exception $exception) {
             $this->fail = new DatamanagerException($exception->getMessage(), $exception->getCode(), $exception);
@@ -103,8 +122,13 @@ trait CrudTrait{
         try {
             $stmt = Connect::getInstance()->prepare("DELETE FROM {$this->table} WHERE {$terms}");
 
+            $this->lastQuery = "DELETE FROM {$this->table} WHERE {$terms}";
+            $this->lastData = [];
+
             if($params){
                 parse_str($params, $arr);
+                $this->lastData = $arr;
+
                 $stmt->execute($arr);
                 return true;
             }

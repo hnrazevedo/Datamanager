@@ -6,6 +6,9 @@ use HnrAzevedo\Datamanager\DatamanagerException;
 
 trait EntityTrait{
     use CheckTrait;
+
+    protected string $lastQuery = '';
+    protected array $lastData = [];
     
     public function toEntity()
     {
@@ -80,7 +83,10 @@ trait EntityTrait{
             return $this;
         }
 
-        $this->delete($this->mountRemove()['where'], substr( $this->mountRemove()['data'] ,0,-1) );
+        $this->delete(
+            $this->mountRemove()['where'], 
+            substr( $this->mountRemove()['data'] ,0,-1)
+        );
 
         $this->check_fail();
             
@@ -93,7 +99,7 @@ trait EntityTrait{
 
         try{
             $this->checkForChanges();
-            
+
             $this->update(
                 $this->mountSave()['data'],
                 "{$this->primary}=:{$this->primary}", 

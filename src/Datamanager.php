@@ -6,7 +6,7 @@ use HnrAzevedo\Datamanager\DatamanagerException;
 
 class Datamanager
 {
-    use DataTrait, SynchronizeTrait, EntityTrait, MagicsTrait;
+    use DataTrait, SynchronizeTrait, EntityTrait, MagicsTrait, DebugTrait;
 
     protected ?string $table = null;
     protected ?string $primary = null;
@@ -24,7 +24,7 @@ class Datamanager
         return $this->count;
     }
 
-    public function except($deniable)
+    public function except($deniable): Datamanager
     {
         $deniable = (is_array($deniable)) ? $deniable : [$deniable];
 
@@ -38,7 +38,7 @@ class Datamanager
         return $this;
     }
 
-    public function deny()
+    public function deny(): Datamanager
     {
         foreach ($this->excepts as $field => $value) {
             unset($this->select[$field]);
@@ -46,7 +46,7 @@ class Datamanager
         return $this;
     }
 
-    public function orderBy(string $field, string $ord = 'ASC')
+    public function orderBy(string $field, string $ord = 'ASC'): Datamanager
     {
         $this->isSettable( str_replace(['asc','ASC','desc','DESC',' '],'',$field) );
 
@@ -56,7 +56,7 @@ class Datamanager
         return $this;
     }
 
-    public function only($params)
+    public function only($params): Datamanager
     {
         $params = (is_array($params)) ? $params : [$params];
         $this->select = [];
@@ -72,7 +72,7 @@ class Datamanager
         return $this;
     }
 
-    public function where(array $where)
+    public function where(array $where): Datamanager
     {
         $this->where['AND'] = (array_key_exists('AND',$this->where)) ?? '';
         $w = [];
@@ -94,19 +94,19 @@ class Datamanager
         return $this;
     }
 
-    public function between(array $bet)
+    public function between(array $bet): Datamanager
     {
         $this->between = array_merge($this->between, $bet);
         return $this;
     }
 
-    public function limit(string $limit)
+    public function limit(string $limit): Datamanager
     {
         $this->limit = $limit;
         return $this;
     }
 
-    public function offset(int $offset)
+    public function offset(int $offset): Datamanager
     {
         $this->checkLimit();
 
@@ -119,12 +119,12 @@ class Datamanager
         return $this->result;
     }
 
-    public function first()
+    public function first(): Datamanager
     {
         return  (count($this->result) > 0) ? $this->setByDatabase($this->result[0]) : $this;
     }
 
-    public function setByDatabase(array $arrayValues)
+    public function setByDatabase(array $arrayValues): Datamanager
     {
         $clone = clone $this;
         
@@ -167,12 +167,12 @@ class Datamanager
         return $delete;
     }
 
-    public function findById($id)
+    public function findById($id): Datamanager
     {
         return $this->where([$this->primary,'=',$id]);
     }
 
-    public function execute()
+    public function execute(): Datamanager
     {
         if(!is_null($this->clause) && $this->clause == 'remove'){
             return $this->remove(true);
@@ -192,9 +192,12 @@ class Datamanager
         $this->mountLimit();
         $this->mountOffset();
 
+        
+        $dataSelect = array_merge($this->mountWhereExec()['data'], $this->mountBetweenExec()['data']);
+
         $this->result = $this->select(
             $this->query, 
-            array_merge($this->mountWhereExec()['data'], $this->mountBetweenExec()['data'])
+            $dataSelect
         );
 
         $this->check_fail();
@@ -206,7 +209,7 @@ class Datamanager
         return $this;
     }
 
-    public function find(?int $key = null)
+    public function find(?int $key = null): Datamanager
     {
         $this->query = " SELECT * FROM {$this->table} ";
         return (is_int($key)) ? $this->findById($key) : $this;
