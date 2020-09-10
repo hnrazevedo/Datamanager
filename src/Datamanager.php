@@ -153,7 +153,7 @@ class Datamanager
                 $value = $value->getData()[$this->primary]['value'];
             }
 
-            $string .= '"'.$key.'"'.':"'.$value.'",';
+            $string .= '"'.$key.'"'.':"'.$value['value'].'",';
         }
         return str_replace(',}', '}', '{'.$string.'}');
     }
