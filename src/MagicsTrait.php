@@ -45,10 +45,8 @@ trait MagicsTrait{
             switch($this->data[$field]['type']){
                 case 'date': 
                     return (!empty($this->data[$field]['value'])) ? (@date_format( @date_create_from_format('Y-m-d' , $this->data[$field]['value'] ) , DATAMANAGER_CONFIG['dateformat'])) : null ;
-                    break;
                 case 'datetime': 
                     return (!empty($this->data[$field]['value'])) ? (@date_format( @date_create_from_format('Y-m-d H:i:s' , $this->data[$field]['value'] ) , DATAMANAGER_CONFIG['datetimeformat'])) : null ;
-                    break;
             }
         }
 

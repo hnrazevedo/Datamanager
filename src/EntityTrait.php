@@ -79,8 +79,11 @@ trait EntityTrait{
         $this->clause = null;
 
         if(count($this->where) == 1){
-            $this->removeById();
-            return $this;
+            $delete = $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
+
+            $this->check_fail();
+
+            return $delete;
         }
 
         $this->delete(

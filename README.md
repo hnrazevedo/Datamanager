@@ -8,7 +8,7 @@
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/hnrazevedo/Datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/Datamanager)
 [![Total Downloads](https://img.shields.io/packagist/dt/hnrazevedo/Datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/Datamanager)
 
-###### Datamanager is a simple persistence abstraction component in the database. Its author is not a professional in the development area, just someone from the Technology area who is improving his knowledge.
+##### Datamanager is a simple persistence abstraction component in the database. Its author is not a professional in the development area, just someone from the Technology area who is improving his knowledge.
 
 O Datamanager é um simples componente de abstração de persistência no banco de dados. Seu autor não é profissional da área de desenvolvimento, apenas alguem da área de Tecnologia que está aperfeiçoando seus conhecimentos.
 
@@ -35,7 +35,7 @@ composer require hnrazevedo/Datamanager
 
 ## Documentation
 
-###### For details on how to use the Datamanager, see the sample folder with details in the component directory
+##### For details on how to use the Datamanager, see the sample folder with details in the component directory
 Para mais detalhes sobre como usar o Datamanager, veja a pasta de exemplos com detalhes no diretório do componente
 
 ### Errors
@@ -259,14 +259,13 @@ var_dump($user->debug(true));       // Return array with executed string and fie
 
 ## Support
 
-###### Security: If you discover any security related issues, please email hnr.azevedo@gmail.com instead of using the issue tracker.
+##### Security: If you discover any security related issues, please email hnr.azevedo@gmail.com instead of using the issue tracker.
 
 Se você descobrir algum problema relacionado à segurança, envie um e-mail para hnr.azevedo@gmail.com em vez de usar o rastreador de problemas.
 
 ## Credits
 
 - [Henri Azevedo](https://github.com/hnrazevedo) (Developer)
-- [Robson V. Leite](https://github.com/robsonvleite) (Readme based on your datalayer design)
 
 ## License
 

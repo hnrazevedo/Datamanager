@@ -13,6 +13,8 @@ use HnrAzevedo\Datamanager\Model as Entity;
   */ 
 class User extends Entity{
 
+    private array $fields = [];
+
     public function __construct()
     {
         $this->fields = [
