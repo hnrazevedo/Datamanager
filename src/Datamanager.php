@@ -74,7 +74,7 @@ class Datamanager
 
     public function where(array $where): Datamanager
     {
-        $this->where['AND'] = (array_key_exists('AND',$this->where)) ?? '';
+        $this->where['AND'] = (isset($this->where['AND'])) ? $this->where['AND'] : [] ;
         $w = [];
         foreach ($where as $condition => $values) {
 
@@ -88,10 +88,19 @@ class Datamanager
             $w[(is_int($condition) ? 'AND' : $condition)][] = $values;
                        
         }
-
-        $this->where = array_merge($this->where,$w);
+        
+        $this->setWhere($w);
 
         return $this;
+    }
+
+    private function setWhere(array $where): void
+    {
+        $this->where['AND'] = array_merge($this->where['AND'],$where['AND']);
+
+        if(array_key_exists('OR', $where)){
+            $this->where['OR'] = array_merge( (isset($this->where['OR'])) ? [] : $this->where['OR'] , $where['OR']);
+        }
     }
 
     public function between(array $bet): Datamanager
@@ -169,7 +178,9 @@ class Datamanager
 
     public function findById($id): Datamanager
     {
-        return $this->where([$this->primary,'=',$id]);
+        return $this->where([
+            [$this->primary, '=', $id]
+        ]);
     }
 
     public function execute(): Datamanager
