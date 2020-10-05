@@ -281,10 +281,10 @@ Class User extends Entity{
 
         if(!isset($_SESSION['cache']['datamanager'][get_class($this)])){
             parent::create('user','id');
-            $_SESSION['cache']['datamanager'][get_class($this)] = serialize($this->fields());
+            $_SESSION['cache']['datamanager'][get_class($this)] = serialize($this->clone());
         }
         
-        $this->fields(unserialize($_SESSION['cache']['datamanager'][get_class($this)]));
+        $this->clone(unserialize($_SESSION['cache']['datamanager'][get_class($this)]));
         return $this;
     }
 
