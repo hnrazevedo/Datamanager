@@ -10,11 +10,19 @@ class Model extends Datamanager
 
     public function create(string $table, ?string $prikey = null)
     {
-        return parent::synchronize($table,$prikey);
+        parent::synchronize($table, $prikey);
     }
     
     public function getField(string $name)
     {
-        return array_key_exists($name,$this->fields) ? $this->fields[$name] : $name;
+        return array_key_exists($name, $this->fields) ? $this->fields[$name] : $name;
+    }
+
+    protected function fields(?array $fields = null): array
+    {
+        if(null !== $fields){
+            $this->fields = $fields;
+        }
+        return $this->fields;
     }
 }

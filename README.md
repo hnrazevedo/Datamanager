@@ -4,7 +4,7 @@
 [![Latest Version](https://img.shields.io/github/v/tag/hnrazevedo/Datamanager?label=version&style=flat-square)](https://github.com/hnrazevedo/Datamanager/releases)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/quality/g/hnrazevedo/Datamanager?style=flat-square)](https://scrutinizer-ci.com/g/hnrazevedo/Datamanager/?branch=master)
 [![Build Status](https://img.shields.io/scrutinizer/build/g/hnrazevedo/Datamanager?style=flat-square)](https://scrutinizer-ci.com/g/hnrazevedo/Datamanager/build-status/master)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/hnrazevedo/Datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/Datamanager)
 [![Total Downloads](https://img.shields.io/packagist/dt/hnrazevedo/Datamanager?style=flat-square)](https://packagist.org/packages/hnrazevedo/Datamanager)
 
@@ -24,7 +24,7 @@ O Datamanager é um simples componente de abstração de persistência no banco 
 Datamanager is available via Composer:
 
 ```bash 
-"hnrazevedo/datamanager": "^1.1"
+"hnrazevedo/datamanager": "^2.0"
 ```
 
 or run
@@ -254,7 +254,41 @@ var_dump($user->debug(true));       // Return array with executed string and fie
  * }
  * 
 */
+```
 
+### Cache model
+
+#### To avoid abstracting the greatest amount of persistence errors in the database, Datamanager describes the model as soon as the instance is created, in a static way, so that at other times of the application if the same by instance, the query will not be made again.
+
+Para evitar abstrair a maior quantidade de erros de persistencias no banco de dados, o Datamanager faz um describe do model assim que o instânciado, de uma forma estática, para que em outros momentos da aplicação se o mesmo for instânciado, a consulta não sejá feita novamente.
+
+#### To improve it even more, but the performance of your application is possible to cache this structure query, below is an example below a simple cache in SESSION.
+
+Para melhorar ainda mas o desempenho de sua aplicação é possível cachear está consulta da estrutura, segue exemplo abaixo de um simples cache em SESSION. 
+```php
+namespace App\Model;
+
+use HnrAzevedo\Datamanager\Model as Entity;
+
+Class User extends Entity{
+
+    public function __construct(){
+        
+        $this->fields = [
+            'email'=>'Email',
+            'username'=>'Nome de usuário'
+        ];
+
+        if(!isset($_SESSION['cache']['datamanager'][get_class($this)])){
+            parent::create('user','id');
+            $_SESSION['cache']['datamanager'][get_class($this)] = serialize($this->fields());
+        }
+        
+        $this->fields(unserialize($_SESSION['cache']['datamanager'][get_class($this)]));
+        return $this;
+    }
+
+}
 ```
 
 ## Support
