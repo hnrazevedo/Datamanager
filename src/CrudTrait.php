@@ -76,6 +76,7 @@ trait CrudTrait{
 
             $stmt = Connect::getInstance()->prepare("INSERT INTO {$this->table} ({$columns}) VALUES ({$values})");
 
+            $this->checkNull($data);
             $dataInsert = $this->filter($data);
 
             $this->lastQuery = "INSERT INTO {$this->table} ({$columns}) VALUES ({$values})";
@@ -108,6 +109,7 @@ trait CrudTrait{
             $this->lastQuery = "UPDATE {$this->table} SET {$dateSet} WHERE {$terms}";
             $this->lastData = $dataUpdate;
 
+            $this->checkNull($data);
             $stmt->execute($dataUpdate);
 
             return ($stmt->rowCount() ?? 1);

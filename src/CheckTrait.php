@@ -73,4 +73,16 @@ trait CheckTrait{
             }
         }
     }
+
+    protected function checkNull(array $data)
+    {
+        foreach($this->data as $input => $attr){
+            if(!array_key_exists($input, $data)){
+                continue;
+            }
+            if(($attr['null'] === 0) && (null === $data[$input])){
+                throw new DatamanagerException("{$input} cannot be null");
+            }
+        }
+    }
 }
