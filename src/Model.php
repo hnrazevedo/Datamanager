@@ -26,6 +26,7 @@ class Model extends Datamanager
             $this->fields($clone['fields']);
             $this->select = $clone['select'];
             $this->data = $clone['data'];
+            $this->full = true;
         }
 
         return [
