@@ -18,7 +18,8 @@ trait MagicsTrait{
                     $value = (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value) , 'Y-m-d'));
                     break;
             }
-            $this->checkMaxlength($prop, $value, $this->data[$prop]['maxlength']);
+
+            $this->checkSettable($prop, $value, $this->data[$prop]['maxlength']);
         }
 
         $this->isSettable($prop);
@@ -28,6 +29,8 @@ trait MagicsTrait{
         
         return $this;
     }
+
+    
 
     public function getVars(): array
     {

@@ -6,7 +6,7 @@ use HnrAzevedo\Datamanager\DatamanagerException;
 
 trait CheckTrait{
 
-    protected function check_where_array(array $where)
+    protected function check_where_array(array $where): void
     {
         if(count($where) != 3){
             throw new DatamanagerException("Condition where set incorrectly: ".implode(' ',$where));
@@ -17,24 +17,31 @@ trait CheckTrait{
         }
     }
 
-    protected function isSettable(string $prop)
+    protected function isSettable(string $prop): void
     {
         if($this->full && !array_key_exists($prop,$this->data)){
             throw new DatamanagerException("{$prop} field does not exist in the table {$this->table}.");
         }
     }
 
-    protected function checkLimit()
+    protected function checkLimit(): void
     {
         if(is_null($this->limit)){
             throw new DatamanagerException("The limit must be set before the offset.");
         }
     }
 
-    protected function checkMaxlength(string $field, $val , $max)
+    protected function checkMaxlength(string $field, $val , $max): void
     {
         if(strlen($val) > $max){
             throw new DatamanagerException("The information provided for column {$field} of table {$this->table} exceeded that allowed.");
+        }
+    }
+
+    protected function checkSettable(string $field, $val , $max): void
+    {   
+        if($this->options['maxlength']){
+            $this->checkMaxlength($field, $val, $max);
         }
     }
 
@@ -62,7 +69,7 @@ trait CheckTrait{
         return true;
     }
 
-    protected function checkUniques($data)
+    protected function checkUniques($data): void
     {
         foreach($this->data as $d => $dd){
             if($dd['key'] === 'UNI'){
@@ -74,7 +81,7 @@ trait CheckTrait{
         }
     }
 
-    protected function checkNull(array $data)
+    protected function checkNull(array $data): void
     {
         foreach($this->data as $input => $attr){
             if(!array_key_exists($input, $data)){

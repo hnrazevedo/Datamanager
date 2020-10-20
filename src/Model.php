@@ -7,6 +7,9 @@ use HnrAzevedo\Datamanager\Datamanager;
 class Model extends Datamanager
 {
     protected array $fields = [];
+    protected array $options = [
+        'maxlength' => true
+    ];
 
     public function create(string $table, ?string $prikey = null)
     {
@@ -16,6 +19,11 @@ class Model extends Datamanager
     public function getField(string $name)
     {
         return array_key_exists($name, $this->fields) ? $this->fields[$name] : $name;
+    }
+
+    protected function maxlength(bool $option): void
+    {
+        $this->options['maxlength'] = $option;
     }
 
     protected function clone(?array $clone = null): array
