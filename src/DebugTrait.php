@@ -16,12 +16,10 @@ trait DebugTrait
         $query = $this->lastQuery;
 
         foreach($this->lastData as $name => $value){
-            $query = str_replace(":{$name}","'{$value}'",$query);
+            $query = str_replace(":{$name}", "'{$value}'", $query);
         }
 
         return $query;
     }    
-
-    
 
 }

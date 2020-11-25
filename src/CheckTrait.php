@@ -4,37 +4,46 @@ namespace HnrAzevedo\Datamanager;
 
 use HnrAzevedo\Datamanager\DatamanagerException;
 
-trait CheckTrait{
+trait CheckTrait
+{
+    protected static array $DATAMANAGER_LANG = [];
 
-    protected function check_where_array(array $where): void
+    protected function throwDefined(): void
+    {
+        if(!defined('DATAMANAGER_CONFIG')){
+            throw new DatamanagerException('Information for connection to the database not defined.');
+        }
+    }
+
+    protected function checkWhereArray(array $where): void
     {
         if(count($where) != 3){
-            throw new DatamanagerException("Condition where set incorrectly: ".implode(' ',$where));
+            throw new DatamanagerException(self::$DATAMANAGER_LANG['whereIntegrity'] . ": ".implode(' ',$where));
         }
 
-        if(!array_key_exists($where[0],$this->data) && $this->full){
-            throw new DatamanagerException("{$where[0]} field does not exist in the table {$this->table}.");
+        if(!array_key_exists($where[0], $this->data) && $this->full){
+            throw new DatamanagerException("{$where[0]} " . self::$DATAMANAGER_LANG['fieldNotFound'] . " {$this->table}.");
         }
     }
 
     protected function isSettable(string $prop): void
     {
-        if($this->full && !array_key_exists($prop,$this->data)){
-            throw new DatamanagerException("{$prop} field does not exist in the table {$this->table}.");
+        if($this->full && !array_key_exists($prop, $this->data)){
+            throw new DatamanagerException("{$prop} " . self::$DATAMANAGER_LANG['fieldNotFound'] . " {$this->table}.");
         }
     }
 
     protected function checkLimit(): void
     {
         if(is_null($this->limit)){
-            throw new DatamanagerException("The limit must be set before the offset.");
+            throw new DatamanagerException(self::$DATAMANAGER_LANG['exceededLimit']);
         }
     }
 
     protected function checkMaxlength(string $field, $val , $max): void
     {
         if(strlen($val) > $max){
-            throw new DatamanagerException("The information provided for column {$field} of table {$this->table} exceeded that allowed.");
+            throw new DatamanagerException($this->getField($field) . " " . self::$DATAMANAGER_LANG['exceededMaxlength'] . " {$this->table}");
         }
     }
 
@@ -52,7 +61,7 @@ trait CheckTrait{
 
     protected function isIncremented(string $field): bool
     {
-        return ( strstr($this->data[$field]['extra'],'auto_increment') && $field === $this->primary );
+        return ( strstr($this->data[$field]['extra'], 'auto_increment') && $field === $this->primary );
     }
 
     protected function checkForChanges(): bool
@@ -64,7 +73,7 @@ trait CheckTrait{
             }
         }
         if(!$hasChanges){
-            throw new DatamanagerException('There were no changes to be saved in the database.');
+            throw new DatamanagerException(self::$DATAMANAGER_LANG['dontUpdate']);
         }
         return true;
     }
@@ -73,9 +82,9 @@ trait CheckTrait{
     {
         foreach($this->data as $d => $dd){
             if($dd['key'] === 'UNI'){
-                $exist = $this->find()->where([$d,'=',$data[$d]])->only('id')->execute()->getCount();
+                $exist = $this->find()->where([$d,'=', $data[$d]])->only('id')->execute()->getCount();
                 if($exist > 0){
-                    throw new DatamanagerException("A record with the same {$this->getField($d)} already exists.");
+                    throw new DatamanagerException(self::$DATAMANAGER_LANG['duplicity'] . " {$this->getField($d)}.");
                 }
             }
         }
@@ -88,8 +97,9 @@ trait CheckTrait{
                 continue;
             }
             if(($attr['null'] === 0) && (null === $data[$input])){
-                throw new DatamanagerException("{$input} cannot be null");
+                throw new DatamanagerException($this->getField($input) . " " . self::$DATAMANAGER_LANG['notNull']);
             }
         }
     }
+
 }

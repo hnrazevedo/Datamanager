@@ -17,9 +17,10 @@ try{
     /* Set new info for insert in database */
     $entity->name = 'Henri Azevedo';
     $entity->email = 'hnr.azevedo@gmail.com';
-    $entity->password = password_hash('123456' ,PASSWORD_DEFAULT);
+    $entity->password = password_hash('123456', PASSWORD_DEFAULT);
     $entity->birth = '28/09/1996';
     $entity->register = date('Y-m-d H:i:s');
+    $entity->weight = floatval('70.50');
 
     /* Insert entity in database */
     $entity->persist();

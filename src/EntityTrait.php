@@ -4,13 +4,14 @@ namespace HnrAzevedo\Datamanager;
 
 use HnrAzevedo\Datamanager\DatamanagerException;
 
-trait EntityTrait{
+trait EntityTrait
+{
     use CheckTrait;
 
     protected string $lastQuery = '';
     protected array $lastData = [];
     
-    public function toEntity()
+    public function toEntity(): ?self
     {
         if($this->getCount() === 0){
             return null;
@@ -28,14 +29,14 @@ trait EntityTrait{
         return $entity;
     }
 
-    public function persist()
+    public function persist(): self
     {
         $columns = '';
         $values = '';
         $data = [];
 
         foreach ($this->data as $key => $value) {
-            if(strstr($this->data[$key]['extra'],'auto_increment')){
+            if(strstr($this->data[$key]['extra'], 'auto_increment')){
                 continue;
             }
 
@@ -48,19 +49,12 @@ trait EntityTrait{
 
         $this->transaction('begin');
         try{
-
             $this->checkUniques($data);
-           
             $id = $this->insert($data);
-
             $this->check_fail();
-
             $primary = $this->primary;
-            
             $this->$primary = $id;
-            
             $this->transaction('commit');
-
         }catch(DatamanagerException $er){
             $this->transaction('rollback');
             throw $er;
@@ -69,7 +63,7 @@ trait EntityTrait{
         return $this;
     }
 
-    public function remove(bool $exec = false)
+    public function remove(bool $exec = false): self
     {
         if(!$exec){
             $this->clause = 'remove';    
@@ -80,9 +74,7 @@ trait EntityTrait{
 
         if(count($this->where) == 1){
             $delete = $this->delete("{$this->primary}=:{$this->primary}","{$this->primary}={$this->getData()[$this->primary]['value']}");
-
             $this->check_fail();
-
             return $delete;
         }
 
@@ -96,7 +88,7 @@ trait EntityTrait{
         return $this;
     }
 
-    public function save()
+    public function save(): self
     {
         $this->transaction('begin');
 
@@ -119,4 +111,5 @@ trait EntityTrait{
 
         return $this;
     }
+    
 }

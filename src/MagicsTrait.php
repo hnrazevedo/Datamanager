@@ -2,9 +2,10 @@
 
 namespace HnrAzevedo\Datamanager;
 
-trait MagicsTrait{
+trait MagicsTrait
+{
 
-    public function __set(string $prop,$value)
+    public function __set(string $prop, $value): self
     {
         if(is_array($value)){
             $attr = array_keys($value)[0];
@@ -15,7 +16,7 @@ trait MagicsTrait{
         if($this->full){
             switch($this->data[$prop]['type']){
                 case 'date':
-                    $value = (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'],$value) , 'Y-m-d'));
+                    $value = (date_format( date_create_from_format(DATAMANAGER_CONFIG['dateformat'], $value) , 'Y-m-d'));
                     break;
             }
 
@@ -29,8 +30,6 @@ trait MagicsTrait{
         
         return $this;
     }
-
-    
 
     public function getVars(): array
     {

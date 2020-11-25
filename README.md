@@ -24,7 +24,7 @@ O Datamanager é um simples componente de abstração de persistência no banco 
 Datamanager is available via Composer:
 
 ```bash 
-"hnrazevedo/datamanager": "^2.0"
+"hnrazevedo/datamanager": "^2.1"
 ```
 
 or run
@@ -70,7 +70,8 @@ define("DATAMANAGER_CONFIG", [
         PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING
     ],
     "dateformat" => "d/m/Y",
-    "datetimeformat" => "d/m/Y H:i:s"
+    "datetimeformat" => "d/m/Y H:i:s",
+    "lang" => "pt_br"
 ]);
 ```
 
@@ -91,15 +92,15 @@ class User extends Model
         /* To return something in place in the database table field in case of errors. */
         /* NOTE: its definition is optional. */
         $this->fields = [
-            'email'=>'Email',
-            'username'=>'Nome de usuário'
+            'email' => 'Email',
+            'username' => 'Nome de usuário'
         ];
 
         /**
          * @param string Table name
          * @param string Primary key column
          */
-        parent::create('user','id');
+        parent::create('user', 'id');
     }
 }
 ```
@@ -270,13 +271,14 @@ namespace App\Model;
 
 use HnrAzevedo\Datamanager\Model as Entity;
 
-Class User extends Entity{
+Class User extends Entity
+{
 
     public function __construct(){
         
         $this->fields = [
-            'email'=>'Email',
-            'username'=>'Nome de usuário'
+            'email' => 'Email',
+            'username' => 'Nome de usuário'
         ];
 
         if(!isset($_SESSION['cache']['datamanager'][get_class($this)])){

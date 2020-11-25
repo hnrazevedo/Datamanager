@@ -14,11 +14,6 @@ class Connect
     {
         if (empty(self::$instance)) {
             try {
-
-                if(!defined('DATAMANAGER_CONFIG')){
-                    throw new DatamanagerException("Information for connection to the database not defined.");
-                }
-
                 self::$instance = new PDO(
                     DATAMANAGER_CONFIG['driver'] . ':host='.DATAMANAGER_CONFIG['host'] . ';port='.DATAMANAGER_CONFIG['port'] . ';dbname='.DATAMANAGER_CONFIG['database'] . ';charset='.DATAMANAGER_CONFIG['charset'],
                     DATAMANAGER_CONFIG['username'],
@@ -26,7 +21,7 @@ class Connect
                     DATAMANAGER_CONFIG['options']
                 );
             } catch (Exception $exception) {
-                throw new DatamanagerException(str_replace(['SQLSTATE[HY000]',"[{$exception->getCode()}]"], '', $exception->getMessage()), $exception->getCode(), $exception);
+                throw new DatamanagerException(str_replace(['SQLSTATE' ,"[{$exception->getCode()}]"], '', $exception->getMessage()), $exception->getCode(), $exception);
             }
         }
         return self::$instance;

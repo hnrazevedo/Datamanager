@@ -13,6 +13,7 @@ class Model extends Datamanager
 
     public function create(string $table, ?string $prikey = null)
     {
+        $this->lang();
         parent::synchronize($table, $prikey);
     }
     
@@ -53,4 +54,19 @@ class Model extends Datamanager
         }
         return $this->fields;
     }
+
+    private function lang(): void
+    {
+        if(count(self::$DATAMANAGER_LANG) > 0){
+            return;
+        }
+
+        $this->throwDefined();
+
+        $lang = (isset(DATAMANAGER_CONFIG['lang'])) ? DATAMANAGER_CONFIG['lang'] : 'en';
+
+        require __DIR__ . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . $lang . '.php';
+        self::$DATAMANAGER_LANG = $DATAMANAGER_LANG;
+    }
+
 }

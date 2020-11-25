@@ -6,8 +6,8 @@ define("DATAMANAGER_CONFIG", [
     "charset" => "utf8",
     "port" => 3306,
     "username" => "root",
-    "password" => "908077",
-    "database" => "datamanager_test",
+    "password" => "",
+    "database" => "datamanager",
     "timezone" => "America/Sao_Paulo",
     "options" => [
         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
@@ -17,5 +17,6 @@ define("DATAMANAGER_CONFIG", [
         PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING
     ],
     "dateformat" => "d/m/Y",
-    "datetimeformat" => "d/m/Y H:i:s"
+    "datetimeformat" => "d/m/Y H:i:s",
+    "lang" => "pt_br"
 ]);

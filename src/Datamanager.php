@@ -6,13 +6,17 @@ use HnrAzevedo\Datamanager\DatamanagerException;
 
 class Datamanager
 {
-    use DataTrait, SynchronizeTrait, EntityTrait, MagicsTrait, DebugTrait;
+    use DataTrait,
+        SynchronizeTrait,
+        EntityTrait,
+        MagicsTrait,
+        DebugTrait;
 
     protected ?string $table = null;
     protected ?string $primary = null;
     protected array $data = [];
     protected array $where = [''=> ["1",'=',"1"] ];
-    protected array $between = [];    
+    protected array $between = [];
 
     public function getData(): ?array
     {
@@ -30,7 +34,7 @@ class Datamanager
 
         foreach ($deniable as $field) {
             if(!array_key_exists($field,$this->data)){
-                throw new DatamanagerException("{$field} field does not exist in the table {$this->table}.");
+                throw new DatamanagerException("{$field} " . self::$DATAMANAGER_LANG['fieldNotFound'] . " {$this->table}.");
             }
             $this->excepts[$field] = true;
         }
@@ -48,9 +52,9 @@ class Datamanager
 
     public function orderBy(string $field, string $ord = 'ASC'): Datamanager
     {
-        $this->isSettable( str_replace(['asc','ASC','desc','DESC',' '],'',$field) );
+        $this->isSettable( str_replace(['asc', 'ASC', 'desc', 'DESC', ' '], '', $field) );
 
-        $ord = (strpos(strtolower($field),'asc') || strpos(strtolower($field),'desc')) ? '' : $ord;
+        $ord = (strpos(strtolower($field), 'asc') || strpos(strtolower($field), 'desc')) ? '' : $ord;
 
         $this->order = " ORDER BY {$field} {$ord} ";
         return $this;
@@ -83,7 +87,7 @@ class Datamanager
                 continue;
             }
 
-            $this->check_where_array($values);
+            $this->checkWhereArray($values);
 
             $w[(is_int($condition) ? 'AND' : $condition)][] = $values;
                        
@@ -118,7 +122,6 @@ class Datamanager
     public function offset(int $offset): Datamanager
     {
         $this->checkLimit();
-
         $this->offset = $offset;
         return $this;
     }
@@ -225,7 +228,6 @@ class Datamanager
         $this->query = " SELECT * FROM {$this->table} ";
         return (is_int($key)) ? $this->findById($key) : $this;
     }
-
     
     
 }

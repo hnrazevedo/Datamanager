@@ -7,12 +7,13 @@ use Exception;
 use PDO;
 
 trait CrudTrait{
+    use CheckTrait;
 
     protected ?DatamanagerException $fail = null;
     protected string $lastQuery = '';
     protected array $lastData = [];
 
-    protected function check_fail()
+    protected function check_fail(): void
     {
         if(!is_null($this->fail)){
             throw $this->fail;
@@ -21,8 +22,8 @@ trait CrudTrait{
 
     protected function transaction(string $transaction): ?bool
     {
-        if(array_key_exists($transaction,['begin','commit','rollback'])){
-            throw new DatamanagerException("{$transaction} é um estado inválido para transações.");
+        if(array_key_exists($transaction, ['begin', 'commit', 'rollback'])){
+            throw new DatamanagerException("{$transaction} " . self::$DATAMANAGER_LANG['notTransaction']);
         }
 
         if(!Connect::getInstance()->inTransaction()){
@@ -36,7 +37,7 @@ trait CrudTrait{
         return false;
     }
 
-    protected function select(string $query,array $data): ?array
+    protected function select(string $query, array $data): ?array
     {
         try{
             $stmt = Connect::getInstance()->prepare("{$query}");

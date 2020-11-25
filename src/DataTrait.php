@@ -2,8 +2,10 @@
 
 namespace HnrAzevedo\Datamanager;
 
-trait DataTrait{
-    use CrudTrait, CheckTrait;
+trait DataTrait
+{
+    use CrudTrait,
+        CheckTrait;
 
     protected ?string $table = null;
     protected ?string $primary = null;
@@ -117,25 +119,28 @@ trait DataTrait{
         return $return;
     }
 
-    protected function mountSelect()
+    protected function mountSelect(): void
     {
-        $select = implode(',',array_keys($this->select));
-
-        $this->query = str_replace('*', $select,$this->query);
+        $this->query = str_replace('*', implode(',', array_keys($this->select)) , $this->query);
     }
 
-    protected function mountLimit()
+    protected function mountLimit(): void
     {
-        if(!is_null($this->limit)){
-            $this->query .= " LIMIT {$this->limit}";
+        if(null === $this->limit){
+            return;
         }
+
+        $this->query .= " LIMIT {$this->limit} ";
+
     }
 
-    protected function mountOffset()
+    protected function mountOffset(): void
     {
-        if(!is_null($this->offset)){
-            $this->query .= " OFFSET {$this->offset}";
+        if(null === $this->offset){
+            return;
         }
+
+        $this->query .= " OFFSET {$this->offset} ";
     }
 
 }
