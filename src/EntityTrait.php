@@ -11,7 +11,7 @@ trait EntityTrait
     protected string $lastQuery = '';
     protected array $lastData = [];
     
-    public function toEntity(): ?self
+    public function toEntity()
     {
         if($this->getCount() === 0){
             return null;
