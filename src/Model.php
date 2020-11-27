@@ -29,6 +29,7 @@ class Model extends Datamanager
 
     protected function clone(?array $clone = null): array
     {
+        $this->lang();
         if(null !== $clone){
             $this->table = $clone['table'];
             $this->primary = $clone['primary_key'];
