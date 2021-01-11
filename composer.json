@@ -16,7 +16,8 @@
     "license":"MIT",
     "autoload": {
         "psr-4": {
-            "HnrAzevedo\\Datamanager\\":"src/"
+            "HnrAzevedo\\Datamanager\\":"src/",
+            "HnrAzevedo\\Datamanager\\Attributes\\":"src/attributes/"
         }
     }
 }

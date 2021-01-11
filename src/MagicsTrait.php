@@ -5,7 +5,7 @@ namespace HnrAzevedo\Datamanager;
 trait MagicsTrait
 {
 
-    public function __set(string $prop, $value): self
+    public function __set(string $prop, $value)
     {
         if(is_array($value)){
             $attr = array_keys($value)[0];
