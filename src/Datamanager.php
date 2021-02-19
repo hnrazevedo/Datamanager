@@ -52,11 +52,16 @@ class Datamanager
 
     public function orderBy(string $field, string $ord = 'ASC'): Datamanager
     {
-        $this->isSettable( str_replace(['asc', 'ASC', 'desc', 'DESC', ' '], '', $field) );
+        $order = '';
+        foreach(explode(',', $field) as $f){
+            $this->isSettable( str_replace(['asc', 'ASC', 'desc', 'DESC', ' '], '', $f) );
 
-        $ord = (strpos(strtolower($field), 'asc') || strpos(strtolower($field), 'desc')) ? '' : $ord;
+            $ord = (strpos(strtolower($f), 'asc') || strpos(strtolower($f), 'desc')) ? '' : $ord;
+            
+            $order .= "{$f} {$ord}, ";
+        }
 
-        $this->order = " ORDER BY {$field} {$ord} ";
+        $this->order = " ORDER BY " . substr($order, 0, -2);
         return $this;
     }
 
