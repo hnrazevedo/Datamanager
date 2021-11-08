@@ -2,12 +2,32 @@
 
 namespace Model;
 
-use HnrAzevedo\Datamanager\Attributes\Entity;
-use HnrAzevedo\Datamanager\Attributes\Column;
-
-#[Entity(table: 'User')]
-class User
+use HnrAzevedo\Datamanager\Model as Entity;
+/** 
+  * @property string $name 
+  * @property string $email 
+  * @property string $password
+  * @property string birth
+  * @property string register
+  * @property string $birth
+  * @property string $register
+  * @property string $weight
+  */ 
+class User extends Entity
 {
-    #[Column(name: 'name', type: 'string', max: 50, min: 5)]
-    public string $name;
+    public function __construct()
+    {
+        $this->fields = [
+            'email'=>'Email',
+            'username'=>'Nome de usuário'
+            'email' => 'Email',
+            'username' => 'Nome de usuário',
+            'weight' => 'Peso'
+        ];
+        /**
+         * @param string Table name
+         * @param string Primary key column
+         */
+        parent::create('user', 'id');
+    }
 }
